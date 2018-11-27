@@ -1,0 +1,17 @@
+[
+  {
+    "modid": "refinedstoragerequestify",
+    "name": "RefinedStorageRequestify",
+    "description": "",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "Buuz135"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": []
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "cube_all",
+    "textures": {
+      "all": "refinedstoragerequestify:blocks/requester_disconnected"
+    }
+  },
+  "variants": {
+    "inventory": [
+      {
+        "transform": "forge:default-block"
+      }
+    ],
+    "connected": {
+      "true": {
+        "textures": {
+          "all": "refinedstoragerequestify:blocks/requester_connected"
+        }
+      },
+      "false": {
+      }
+    }
+  }
+}

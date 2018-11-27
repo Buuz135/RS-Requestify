@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RDR",
+    "CFC",
+    "RPR"
+  ],
+  "key":{
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "D": {
+      "item": "refinedstorage:detector"
+    },
+    "C": {
+      "item": "refinedstorage:upgrade",
+      "data": 3
+    },
+    "F": {
+      "item": "refinedstorage:machine_casing"
+    },
+    "P": {
+      "item":"refinedstorage:processor",
+      "data": 5
+    }
+  },
+  "result": {
+    "item": "refinedstoragerequestify:requester"
+  }
+}
