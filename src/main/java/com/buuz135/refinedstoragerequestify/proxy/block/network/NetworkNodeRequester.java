@@ -69,8 +69,8 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
                 if (!filter.isEmpty()) {
                     ItemStack current = network.extractItem(filter, amount, Action.SIMULATE);
                     if (current == null || current.isEmpty() || current.getCount() < amount) {
-                        int count = current == null || current.isEmpty() ? amount : amount-current.getCount();
-                        if (count > 0){
+                        int count = current == null || current.isEmpty() ? amount : amount - current.getCount();
+                        if (count > 0) {
                             craftingTask = network.getCraftingManager().request(this, filter, Math.min(RequestifyConfig.MAX_CRAFT_AMOUNT, count));
                             isMissingItems = true;
                         }
@@ -79,14 +79,14 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
                     }
                 }
             }
-            if (type == IType.FLUIDS){
+            if (type == IType.FLUIDS) {
                 FluidStack filter = fluidFilter.getFluid(0);
-                if (filter != null){
+                if (filter != null) {
                     FluidStack current = network.extractFluid(filter, amount, Action.SIMULATE);
-                    if (current == null || current.amount < amount){
-                        int count = current == null  ? amount : amount-current.amount;
-                        if (count > 0){
-                            craftingTask  = network.getCraftingManager().request(this, filter, count);
+                    if (current == null || current.amount < amount) {
+                        int count = current == null ? amount : amount - current.amount;
+                        if (count > 0) {
+                            craftingTask = network.getCraftingManager().request(this, filter, count);
                             isMissingItems = true;
                         }
                     } else {
@@ -145,7 +145,7 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
     public void read(NBTTagCompound tag) {
         super.read(tag);
         StackUtils.readItems(itemFilter, 0, tag);
-        if (tag.hasKey(NBT_AMOUNT)){
+        if (tag.hasKey(NBT_AMOUNT)) {
             amount = tag.getInteger(NBT_AMOUNT);
         }
         if (tag.hasKey(NBT_MISSING)) {
@@ -183,7 +183,7 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
         if (tag.hasKey(NBT_FLUID_FILTERS)) {
             fluidFilter.readFromNbt(tag.getCompoundTag(NBT_FLUID_FILTERS));
         }
-        if (tag.hasKey(NBT_AMOUNT)){
+        if (tag.hasKey(NBT_AMOUNT)) {
             amount = tag.getInteger(NBT_AMOUNT);
         }
         if (tag.hasKey(NBT_MISSING)) {

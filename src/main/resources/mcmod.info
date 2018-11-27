@@ -12,6 +12,9 @@
     ],
     "credits": "",
     "logoFile": "",
-    "screenshots": []
+    "screenshots": [],
+    "dependencies": [
+      "refinedstorage"
+    ]
   }
 ]

@@ -21,9 +21,9 @@
  */
 package com.buuz135.refinedstoragerequestify.proxy;
 
-import com.buuz135.refinedstoragerequestify.proxy.client.GuiHandler;
 import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.block.BlockRequester;
+import com.buuz135.refinedstoragerequestify.proxy.client.GuiHandler;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;

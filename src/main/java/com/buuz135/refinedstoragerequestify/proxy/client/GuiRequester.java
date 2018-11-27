@@ -47,11 +47,11 @@ public class GuiRequester extends GuiBase {
     public void init(int x, int y) {
         addSideButton(new SideButtonRedstoneMode(this, TileRequester.REDSTONE_MODE));
         addSideButton(new SideButtonType(this, TileRequester.TYPE));
-        textField = new GuiTextField(-135, Minecraft.getMinecraft().fontRenderer, x+20+18,y+23,80,10);
-        textField.setText(TileRequester.AMOUNT.getValue() +"");
+        textField = new GuiTextField(-135, Minecraft.getMinecraft().fontRenderer, x + 20 + 18, y + 23, 80, 10);
+        textField.setText(TileRequester.AMOUNT.getValue() + "");
         textField.setCanLoseFocus(true);
         textField.setFocused(true);
-        button = addButton(x+40+86,y+19,40,20,t("button.refinedstoragerequestify:requester.save"));
+        button = addButton(x + 40 + 86, y + 19, 40, 20, t("button.refinedstoragerequestify:requester.save"));
     }
 
     @Override
@@ -63,9 +63,9 @@ public class GuiRequester extends GuiBase {
     public void drawBackground(int x, int y, int mouseX, int mouseY) {
         bindTexture(RefinedStorageRequestify.MOD_ID, "gui/requester.png");
         drawTexture(x, y, 0, 0, screenWidth, screenHeight);
-        if (TileRequester.MISSING.getValue()){
+        if (TileRequester.MISSING.getValue()) {
             bindTexture("gui/crafting_preview.png");
-            drawTexture(x+153,y+1, 0,256-16,16,16);
+            drawTexture(x + 153, y + 1, 0, 256 - 16, 16, 16);
         }
         textField.drawTextBox();
     }
@@ -74,7 +74,7 @@ public class GuiRequester extends GuiBase {
     public void drawForeground(int mouseX, int mouseY) {
         drawString(7, 7, t("block.refinedstoragerequestify:requester.name"));
         drawString(7, 43, t("container.inventory"));
-        if (TileRequester.MISSING.getValue() && isPointInRegion(153,1, 16,16, mouseX+guiLeft, mouseY+guiTop)){
+        if (TileRequester.MISSING.getValue() && isPointInRegion(153, 1, 16, 16, mouseX + guiLeft, mouseY + guiTop)) {
             drawHoveringText(t("tooltip.refinedstoragerequestify:requester.missing"), mouseX, mouseY);
         }
     }
@@ -88,10 +88,10 @@ public class GuiRequester extends GuiBase {
         StringBuilder builder = new StringBuilder();
         int pos = 0;
         for (char c : textField.getText().toCharArray()) {
-            if (pos == 0 && c == '0' && textField.getText().length() > 1){
+            if (pos == 0 && c == '0' && textField.getText().length() > 1) {
                 continue;
             }
-            if (NumberUtils.isCreatable(c+""))builder = builder.append(c);
+            if (NumberUtils.isCreatable(c + "")) builder = builder.append(c);
             ++pos;
         }
         textField.setText(builder.toString());
@@ -100,10 +100,10 @@ public class GuiRequester extends GuiBase {
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
         super.actionPerformed(button);
-        if (this.button.equals(button) && NumberUtils.isCreatable(textField.getText())){
+        if (this.button.equals(button) && NumberUtils.isCreatable(textField.getText())) {
             long amount = NumberUtils.createLong(textField.getText());
             if (amount > Integer.MAX_VALUE) amount = Integer.MAX_VALUE;
-            TileDataManager.setParameter(TileRequester.AMOUNT, (int)amount);
+            TileDataManager.setParameter(TileRequester.AMOUNT, (int) amount);
         }
     }
 

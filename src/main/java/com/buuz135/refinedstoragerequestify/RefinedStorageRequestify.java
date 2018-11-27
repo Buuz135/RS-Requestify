@@ -23,12 +23,10 @@ package com.buuz135.refinedstoragerequestify;
 
 import com.buuz135.refinedstoragerequestify.proxy.CommonProxy;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -50,17 +48,16 @@ public class RefinedStorageRequestify {
     public static final String MOD_ID = "refinedstoragerequestify";
     public static final String MOD_NAME = "RefinedStorageRequestify";
     public static final String VERSION = "${version}";
-
-    @Mod.Instance(MOD_ID)
-    public static RefinedStorageRequestify INSTANCE;
-    @SidedProxy(clientSide = "com.buuz135.refinedstoragerequestify.proxy.ClientProxy", serverSide = "com.buuz135.refinedstoragerequestify.proxy.CommonProxy")
-    public static CommonProxy proxy;
     public static final CreativeTabs TAB = new CreativeTabs(MOD_ID) {
         @Override
         public ItemStack createIcon() {
             return new ItemStack(CommonProxy.REQUESTER);
         }
     };
+    @Mod.Instance(MOD_ID)
+    public static RefinedStorageRequestify INSTANCE;
+    @SidedProxy(clientSide = "com.buuz135.refinedstoragerequestify.proxy.ClientProxy", serverSide = "com.buuz135.refinedstoragerequestify.proxy.CommonProxy")
+    public static CommonProxy proxy;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {

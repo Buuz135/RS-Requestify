@@ -21,10 +21,10 @@
  */
 package com.buuz135.refinedstoragerequestify.proxy.block;
 
-import com.buuz135.refinedstoragerequestify.proxy.client.GuiHandler;
 import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.block.network.NetworkNodeRequester;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
+import com.buuz135.refinedstoragerequestify.proxy.client.GuiHandler;
 import com.raoulvdberge.refinedstorage.block.BlockNode;
 import com.raoulvdberge.refinedstorage.block.info.BlockInfoBuilder;
 import net.minecraft.block.SoundType;
