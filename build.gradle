@@ -8,14 +8,33 @@ buildscript {
     }
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+        classpath 'com.selesse:gradle-git-changelog:0.2.+'
+        classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
     }
 }
+plugins {
+    id "com.github.hierynomus.license" version "0.14.0"
+    id "com.matthewprenger.cursegradle" version "1.1.0"
+}
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'com.selesse.git.changelog'
+apply plugin: 'java'
 
-apply plugin: "net.minecraftforge.gradle.forge"
 
-version = modVersion
+version = mod_version
 group = modGroup
 archivesBaseName = modBaseName
+
+String b = ""
+if (project.hasProperty("teamcity")) {
+    b = System.getenv("BUILD_NUMBER")
+}
+
+if (b == null || b == "") {
+    version = "${project.minecraft_version}-${project.mod_version}"
+} else {
+    version = "${project.minecraft_version}-${project.mod_version}-" + b
+}
 
 minecraft {
     version = project.forgeVersion
@@ -57,5 +76,60 @@ processResources {
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude "mcmod.info"
+    }
+}
+
+changelog {
+    title = "RS: Requestify"
+    fileName = "CHANGELOG.md"
+    outputDirectory = file("$projectDir")
+    since = '0.0.0'
+    commitFormat = '%s (%an)'
+    markdown {
+        commitFormat = '* %s (%an)'
+    }
+    includeLines = {
+        !it.contains("Merge")
+    }
+    processLines = {
+        String input = it as String
+        if (input.contains('[ci skip] ')) {
+            input = input.minus('[ci skip] ')
+        }
+        input
+    }
+}
+
+tasks.curseforge.enabled =  project.hasProperty('curse_api')
+
+curseforge {
+    if (project.hasProperty('curse_api')) {
+        apiKey = project.curse_api
+    }
+    project {
+        id = '307788'
+        changelog = file('CHANGELOG.md')
+        changelogType = 'markdown'
+        releaseType = 'beta'
+
+        mainArtifact(jar){
+            relations {
+                requiredDependency 'refined-storage'
+            }
+        }
+        
+        addArtifact sourceJar
+    }
+}
+
+license {
+    header rootProject.file('HEADER')
+    include "**/*.java"
+    ext.year = Calendar.getInstance().get(Calendar.YEAR)
+    ext.name = 'Buuz135'
+    ext.mod= 'RS: Requestify'
+    ignoreFailures = true
+    mapping {
+        java='SLASHSTAR_STYLE'
     }
 }
