@@ -41,7 +41,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
         modid = RefinedStorageRequestify.MOD_ID,
         name = RefinedStorageRequestify.MOD_NAME,
         version = RefinedStorageRequestify.VERSION,
-        dependencies = "required-after:refinedstorage@[1.6.9-319,)"
+        dependencies = "required-after:refinedstorage@[1.6.9,)"
 )
 public class RefinedStorageRequestify {
 
