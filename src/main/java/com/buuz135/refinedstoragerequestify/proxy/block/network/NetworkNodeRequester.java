@@ -40,154 +40,212 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 
 public class NetworkNodeRequester extends NetworkNode implements IType {
 
-    public static final String ID = "requester";
+	public static final String ID = "requester";
 
-    private static final String NBT_TYPE = "Type";
-    private static final String NBT_FLUID_FILTERS = "FluidFilter";
-    private static final String NBT_AMOUNT = "Amount";
-    private static final String NBT_MISSING = "MissingItems";
+	private static final String NBT_TYPE = "Type";
+	private static final String NBT_FLUID_FILTERS = "FluidFilter";
+	private static final String NBT_AMOUNT = "Amount";
+	private static final String NBT_MISSING = "MissingItems";
 
-    private ItemHandlerBase itemFilter = new ItemHandlerBase(1, new ListenerNetworkNode(this));
-    private FluidInventory fluidFilter = new FluidInventory(1, new ListenerNetworkNode(this));
+	private ItemHandlerBase itemFilter = new ItemHandlerBase(1, new ListenerNetworkNode(this));
+	private FluidInventory fluidFilter = new FluidInventory(1, new ListenerNetworkNode(this));
 
-    private int type = IType.ITEMS;
-    private int amount = 0;
-    private boolean isMissingItems = false;
-    private ICraftingTask craftingTask = null;
+	private int type = IType.ITEMS;
+	private int amount = 0;
+	private boolean isMissingItems = false;
+	private ICraftingTask craftingTask = null;
+	private boolean isCraftingPossible = true;
 
-    public NetworkNodeRequester(World world, BlockPos pos) {
-        super(world, pos);
-    }
+	public NetworkNodeRequester(World world, BlockPos pos) {
+		super(world, pos);
+	}
 
-    @Override
-    public void update() {
-        super.update();
-        if (network == null) return;
-        if (canUpdate() && ticks % 10 == 0 && (craftingTask == null || !network.getCraftingManager().getTasks().contains(craftingTask))) {
-            if (type == IType.ITEMS) {
-                ItemStack filter = itemFilter.getStackInSlot(0);
-                if (!filter.isEmpty()) {
-                    ItemStack current = network.extractItem(filter, amount, Action.SIMULATE);
-                    if (current == null || current.isEmpty() || current.getCount() < amount) {
-                        int count = current == null || current.isEmpty() ? amount : amount - current.getCount();
-                        if (count > 0) {
-                            craftingTask = network.getCraftingManager().request(this, filter, Math.min(RequestifyConfig.MAX_CRAFT_AMOUNT, count));
-                            isMissingItems = true;
-                        }
-                    } else {
-                        isMissingItems = false;
-                    }
-                }
-            }
-            if (type == IType.FLUIDS) {
-                FluidStack filter = fluidFilter.getFluid(0);
-                if (filter != null) {
-                    FluidStack current = network.extractFluid(filter, amount, Action.SIMULATE);
-                    if (current == null || current.amount < amount) {
-                        int count = current == null ? amount : amount - current.amount;
-                        if (count > 0) {
-                            craftingTask = network.getCraftingManager().request(this, filter, count);
-                            isMissingItems = true;
-                        }
-                    } else {
-                        isMissingItems = false;
-                    }
-                }
-            }
-        }
-    }
+	@Override
+	public void update() {
+		super.update();
+		if (network == null) {
+			return;
+		}
 
-    @Override
-    public int getEnergyUsage() {
-        return 10;
-    }
+		if (!isCraftingPossible && ticks % 1200 == 0) {
+			isCraftingPossible = true;
 
-    @Override
-    public String getId() {
-        return ID;
-    }
+		}
 
-    @Override
-    public int getType() {
-        return world.isRemote ? TileRequester.TYPE.getValue() : type;
-    }
+		if (isCraftingPossible && canUpdate() && ticks % 100 == 0
+				&& (craftingTask == null || !network.getCraftingManager().getTasks().contains(craftingTask))) {
 
-    @Override
-    public void setType(int type) {
-        this.type = type;
-        markDirty();
-    }
+			if (type == IType.ITEMS) {
+				ItemStack filter = itemFilter.getStackInSlot(0);
+				if (!filter.isEmpty()) {
+					ItemStack current = network.getItemStorageCache().getList().get(filter);
 
-    public int getAmount() {
-        return amount;
-    }
+					int count = 0;
 
-    public void setAmount(int amount) {
-        this.amount = amount;
-        markDirty();
-    }
+					if (current == null || current.getCount() == 0) {
+						count = amount;
+					} else {
+						if (current.getCount() < amount) {
+							count = amount - current.getCount();
+						}
+					}
 
-    public boolean isMissingItems() {
-        return isMissingItems && craftingTask == null;
-    }
+					if (count > 0) {
+						if (craftingTask == null) {
+							craftingTask = network.getCraftingManager().request(this, filter,
+									Math.min(RequestifyConfig.MAX_CRAFT_AMOUNT, count));
 
-    @Override
-    public IItemHandlerModifiable getItemFilters() {
-        return itemFilter;
-    }
+							isMissingItems = true;
+							isCraftingPossible = craftingTask == null ? false : true;
 
-    @Override
-    public FluidInventory getFluidFilters() {
-        return fluidFilter;
-    }
 
-    @Override
-    public void read(NBTTagCompound tag) {
-        super.read(tag);
-        StackUtils.readItems(itemFilter, 0, tag);
-        if (tag.hasKey(NBT_AMOUNT)) {
-            amount = tag.getInteger(NBT_AMOUNT);
-        }
-        if (tag.hasKey(NBT_MISSING)) {
-            isMissingItems = tag.getBoolean(NBT_MISSING);
-        }
-    }
+						} else {
+							boolean done = craftingTask.update();
+							if (done) {
+								craftingTask = null;
+								isMissingItems = false;
+							}
 
-    @Override
-    public NBTTagCompound write(NBTTagCompound tag) {
-        super.write(tag);
-        StackUtils.writeItems(itemFilter, 0, tag);
-        tag.setInteger(NBT_AMOUNT, amount);
-        tag.setBoolean(NBT_MISSING, isMissingItems);
-        return tag;
-    }
+						}
 
-    @Override
-    public NBTTagCompound writeConfiguration(NBTTagCompound tag) {
-        super.writeConfiguration(tag);
-        tag.setInteger(NBT_TYPE, type);
-        StackUtils.writeItems(itemFilter, 0, tag);
-        tag.setTag(NBT_FLUID_FILTERS, fluidFilter.writeToNbt());
-        tag.setInteger(NBT_AMOUNT, amount);
-        tag.setBoolean(NBT_MISSING, isMissingItems);
-        return tag;
-    }
+					}
+					else
+					{
+						isMissingItems = false;
+					}
+				}
+			}
+			if (type == IType.FLUIDS) {
+				FluidStack filter = fluidFilter.getFluid(0);
+				if (filter != null) {
+					FluidStack current = network.getFluidStorageCache().getList().get(filter);
 
-    @Override
-    public void readConfiguration(NBTTagCompound tag) {
-        super.readConfiguration(tag);
-        if (tag.hasKey(NBT_TYPE)) {
-            type = tag.getInteger(NBT_TYPE);
-        }
-        StackUtils.readItems(itemFilter, 0, tag);
-        if (tag.hasKey(NBT_FLUID_FILTERS)) {
-            fluidFilter.readFromNbt(tag.getCompoundTag(NBT_FLUID_FILTERS));
-        }
-        if (tag.hasKey(NBT_AMOUNT)) {
-            amount = tag.getInteger(NBT_AMOUNT);
-        }
-        if (tag.hasKey(NBT_MISSING)) {
-            isMissingItems = tag.getBoolean(NBT_MISSING);
-        }
-    }
+					int count = 0;
+
+					if (current == null || current.amount == 0) {
+						count = amount;
+					} else {
+						if (current.amount < amount) {
+							count = amount - current.amount;
+						}
+					}
+
+					if (count > 0) {
+						if (craftingTask == null) {
+							craftingTask = network.getCraftingManager().request(this, filter, count);
+							isMissingItems = true;
+							isCraftingPossible = craftingTask == null ? false : true;
+
+						} else {
+							boolean done = craftingTask.update();
+							if (done) {
+								craftingTask = null;
+								isMissingItems = false;
+							}
+
+						}
+
+					}
+					else
+					{
+						isMissingItems = false;
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public int getEnergyUsage() {
+		return 10;
+	}
+
+	@Override
+	public String getId() {
+		return ID;
+	}
+
+	@Override
+	public int getType() {
+		return world.isRemote ? TileRequester.TYPE.getValue() : type;
+	}
+
+	@Override
+	public void setType(int type) {
+		this.type = type;
+		markDirty();
+	}
+
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
+		markDirty();
+	}
+
+	public boolean isMissingItems() {
+		return isMissingItems && craftingTask == null;
+	}
+
+	@Override
+	public IItemHandlerModifiable getItemFilters() {
+		return itemFilter;
+	}
+
+	@Override
+	public FluidInventory getFluidFilters() {
+		return fluidFilter;
+	}
+
+	@Override
+	public void read(NBTTagCompound tag) {
+		super.read(tag);
+		StackUtils.readItems(itemFilter, 0, tag);
+		if (tag.hasKey(NBT_AMOUNT)) {
+			amount = tag.getInteger(NBT_AMOUNT);
+		}
+		if (tag.hasKey(NBT_MISSING)) {
+			isMissingItems = tag.getBoolean(NBT_MISSING);
+		}
+	}
+
+	@Override
+	public NBTTagCompound write(NBTTagCompound tag) {
+		super.write(tag);
+		StackUtils.writeItems(itemFilter, 0, tag);
+		tag.setInteger(NBT_AMOUNT, amount);
+		tag.setBoolean(NBT_MISSING, isMissingItems);
+		return tag;
+	}
+
+	@Override
+	public NBTTagCompound writeConfiguration(NBTTagCompound tag) {
+		super.writeConfiguration(tag);
+		tag.setInteger(NBT_TYPE, type);
+		StackUtils.writeItems(itemFilter, 0, tag);
+		tag.setTag(NBT_FLUID_FILTERS, fluidFilter.writeToNbt());
+		tag.setInteger(NBT_AMOUNT, amount);
+		tag.setBoolean(NBT_MISSING, isMissingItems);
+		return tag;
+	}
+
+	@Override
+	public void readConfiguration(NBTTagCompound tag) {
+		super.readConfiguration(tag);
+		if (tag.hasKey(NBT_TYPE)) {
+			type = tag.getInteger(NBT_TYPE);
+		}
+		StackUtils.readItems(itemFilter, 0, tag);
+		if (tag.hasKey(NBT_FLUID_FILTERS)) {
+			fluidFilter.readFromNbt(tag.getCompoundTag(NBT_FLUID_FILTERS));
+		}
+		if (tag.hasKey(NBT_AMOUNT)) {
+			amount = tag.getInteger(NBT_AMOUNT);
+		}
+		if (tag.hasKey(NBT_MISSING)) {
+			isMissingItems = tag.getBoolean(NBT_MISSING);
+		}
+	}
 }

@@ -8,7 +8,7 @@ buildscript {
     }
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
-        classpath 'com.selesse:gradle-git-changelog:0.2.+'
+       // classpath 'com.selesse:gradle-git-changelog:0.2.+'
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
     }
 }
@@ -17,7 +17,7 @@ plugins {
     id "com.matthewprenger.cursegradle" version "1.1.0"
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'com.selesse.git.changelog'
+//apply plugin: 'com.selesse.git.changelog'
 apply plugin: 'java'
 
 
@@ -57,7 +57,7 @@ repositories {
 }
 
 dependencies {
-    deobfCompile "refinedstorage:refinedstorage:1.6.14-375"
+    deobfCompile "refinedstorage:refinedstorage:1.6.15-380"
 }
 
 processResources {
@@ -78,7 +78,7 @@ processResources {
         exclude "mcmod.info"
     }
 }
-
+/*
 changelog {
     title = "RS: Requestify"
     fileName = "CHANGELOG.md"
@@ -99,7 +99,7 @@ changelog {
         input
     }
 }
-
+*/
 tasks.curseforge.enabled =  project.hasProperty('curse_api')
 
 curseforge {
