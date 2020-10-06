@@ -23,68 +23,35 @@ package com.buuz135.refinedstoragerequestify.proxy.client;
 
 import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
-import com.raoulvdberge.refinedstorage.gui.GuiBase;
-import com.raoulvdberge.refinedstorage.gui.control.SideButtonRedstoneMode;
-import com.raoulvdberge.refinedstorage.gui.control.SideButtonType;
-import com.raoulvdberge.refinedstorage.tile.data.TileDataManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.refinedmods.refinedstorage.RS;
+import com.refinedmods.refinedstorage.screen.BaseScreen;
+import com.refinedmods.refinedstorage.screen.widget.sidebutton.RedstoneModeSideButton;
+import com.refinedmods.refinedstorage.screen.widget.sidebutton.TypeSideButton;
+import com.refinedmods.refinedstorage.tile.data.TileDataManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.io.IOException;
+public class GuiRequester extends BaseScreen<ContainerRequester> {
 
-public class GuiRequester extends GuiBase {
-
-    private GuiTextField textField;
-    private GuiButton button;
+    private TextFieldWidget textField;
+    private Button button;
 
     public GuiRequester(ContainerRequester container) {
-        super(container, 211, 137);
+        super(container, 211, 137, container.getPlayer().inventory, new TranslationTextComponent("block.refinedstoragerequestify:requester.name"));
     }
 
     @Override
-    public void init(int x, int y) {
-        addSideButton(new SideButtonRedstoneMode(this, TileRequester.REDSTONE_MODE));
-        addSideButton(new SideButtonType(this, TileRequester.TYPE));
-        textField = new GuiTextField(-135, Minecraft.getMinecraft().fontRenderer, x + 20 + 18, y + 23, 80, 10);
-        textField.setText(TileRequester.AMOUNT.getValue() + "");
-        textField.setCanLoseFocus(true);
-        textField.setFocused(true);
-        button = addButton(x + 40 + 86, y + 19, 40, 20, t("button.refinedstoragerequestify:requester.save"));
-    }
-
-    @Override
-    public void update(int x, int y) {
-        textField.updateCursorCounter();
-    }
-
-    @Override
-    public void drawBackground(int x, int y, int mouseX, int mouseY) {
-        bindTexture(RefinedStorageRequestify.MOD_ID, "gui/requester.png");
-        drawTexture(x, y, 0, 0, screenWidth, screenHeight);
-        if (TileRequester.MISSING.getValue()) {
-            bindTexture("gui/crafting_preview.png");
-            drawTexture(x + 153, y + 1, 0, 256 - 16, 16, 16);
-        }
-        textField.drawTextBox();
-    }
-
-    @Override
-    public void drawForeground(int mouseX, int mouseY) {
-        drawString(7, 7, t("block.refinedstoragerequestify:requester.name"));
-        drawString(7, 43, t("container.inventory"));
-        if (TileRequester.MISSING.getValue() && isPointInRegion(153, 1, 16, 16, mouseX + guiLeft, mouseY + guiTop)) {
-            drawHoveringText(t("tooltip.refinedstoragerequestify:requester.missing"), mouseX, mouseY);
-        }
-    }
-
-    @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == 1) {
-            this.mc.player.closeScreen();
+            this.minecraft.player.closeScreen();
         }
-        textField.textboxKeyTyped(typedChar, keyCode);
+        textField.charTyped((char) keyCode, modifiers);
         StringBuilder builder = new StringBuilder();
         int pos = 0;
         for (char c : textField.getText().toCharArray()) {
@@ -95,19 +62,53 @@ public class GuiRequester extends GuiBase {
             ++pos;
         }
         textField.setText(builder.toString());
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+
+    @Override
+    public void onPostInit(int x, int y) {
+        addSideButton(new RedstoneModeSideButton(this, TileRequester.REDSTONE_MODE));
+        addSideButton(new TypeSideButton(this, TileRequester.TYPE));
+        textField = new TextFieldWidget(Minecraft.getInstance().fontRenderer, x + 20 + 18, y + 23, 80, 10, new StringTextComponent(""));
+        textField.setText(TileRequester.AMOUNT.getValue() + "");
+        textField.setCanLoseFocus(true);
+        textField.setFocused2(true);
+        button = addButton(x + 40 + 86, y + 19, 40, 20, new TranslationTextComponent("button.refinedstoragerequestify:requester.save"), true, true, p_onPress_1_ -> {
+            if (NumberUtils.isCreatable(textField.getText())) {
+                long amount = NumberUtils.createLong(textField.getText());
+                if (amount > Integer.MAX_VALUE) amount = Integer.MAX_VALUE;
+                TileDataManager.setParameter(TileRequester.AMOUNT, (int) amount);
+            }
+        });
+    }
+
+    public TextFieldWidget getTextField() {
+        return textField;
     }
 
     @Override
-    protected void actionPerformed(GuiButton button) throws IOException {
-        super.actionPerformed(button);
-        if (this.button.equals(button) && NumberUtils.isCreatable(textField.getText())) {
-            long amount = NumberUtils.createLong(textField.getText());
-            if (amount > Integer.MAX_VALUE) amount = Integer.MAX_VALUE;
-            TileDataManager.setParameter(TileRequester.AMOUNT, (int) amount);
-        }
+    public void tick(int i, int i1) {
+        textField.tick();
     }
 
-    public GuiTextField getAmount() {
-        return textField;
+    @Override
+    public void renderBackground(MatrixStack matrixStack, int x, int y, int mouseX, int mouseY) {
+        this.minecraft.getTextureManager().bindTexture(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "textures/gui/requester.png"));
+        blit(matrixStack, x, y, 0, 0, this.xSize, this.ySize);
+        if (TileRequester.MISSING.getValue()) {
+            bindTexture(RS.ID, "gui/crafting_preview.png");
+            blit(matrixStack, x + 153, y + 1, 0, 256 - 16, 16, 16);
+        }
+        textField.render(matrixStack, mouseX, mouseY, 0);
+    }
+
+    @Override
+    public void renderForeground(MatrixStack matrixStack, int mouseX, int mouseY) {
+        renderString(matrixStack, 7, 7, new TranslationTextComponent("block.rsrequestify.requester").getString());
+        renderString(matrixStack, 7, 43, new TranslationTextComponent("container.inventory").getString());
+        if (TileRequester.MISSING.getValue() && isPointInRegion(153, 1, 16, 16, mouseX + guiLeft, mouseY + guiTop)) {
+            renderTooltip(matrixStack, new TranslationTextComponent("tooltip.refinedstoragerequestify:requester.missing"), mouseX, mouseY);
+        }
     }
 }

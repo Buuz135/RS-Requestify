@@ -23,45 +23,37 @@ package com.buuz135.refinedstoragerequestify.proxy;
 
 import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.block.BlockRequester;
-import com.buuz135.refinedstoragerequestify.proxy.client.GuiHandler;
+import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
+import com.buuz135.refinedstoragerequestify.proxy.client.ContainerRequester;
+import com.refinedmods.refinedstorage.container.factory.PositionalTileContainerFactory;
 import net.minecraft.block.Block;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class CommonProxy {
 
     public static BlockRequester REQUESTER;
-
-    public void preInit(FMLPreInitializationEvent event) {
-        NetworkRegistry.INSTANCE.registerGuiHandler(RefinedStorageRequestify.INSTANCE, new GuiHandler());
-    }
-
-    public void init(FMLInitializationEvent event) {
-
-    }
-
-    public void postInit(FMLPostInitializationEvent event) {
-
-    }
+    public static ContainerType<ContainerRequester> CONTAINER = null;
+    public static TileEntityType<?> TYPE;
 
     public void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(REQUESTER = new BlockRequester());
     }
 
     public void registerItems(RegistryEvent.Register<Item> event) {
-        event.getRegistry().register(new ItemBlock(REQUESTER).setRegistryName(REQUESTER.getRegistryName()));
+        event.getRegistry().register(new BlockItem(REQUESTER, new Item.Properties().group(RefinedStorageRequestify.TAB)).setRegistryName(REQUESTER.getRegistryName()));
     }
 
-    @SideOnly(Side.CLIENT)
-    public void modelRegistryEvent(ModelRegistryEvent event) {
+    public void registerTiles(RegistryEvent.Register<TileEntityType<?>> event) {
+        event.getRegistry().register(TYPE = TileEntityType.Builder.create(TileRequester::new, REQUESTER).build(null).setRegistryName(REQUESTER.getRegistryName()));
+    }
 
+    public void registerContainers(RegistryEvent.Register<ContainerType<?>> event) {
+        event.getRegistry().register(CONTAINER = (ContainerType<ContainerRequester>) IForgeContainerType.create(new PositionalTileContainerFactory<ContainerRequester, TileRequester>((i, playerInventory, tileRequester) -> new ContainerRequester(tileRequester, playerInventory.player, i))).setRegistryName(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "requester")));
     }
 }

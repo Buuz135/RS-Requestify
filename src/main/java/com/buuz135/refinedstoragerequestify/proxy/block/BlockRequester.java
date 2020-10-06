@@ -24,34 +24,70 @@ package com.buuz135.refinedstoragerequestify.proxy.block;
 import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.block.network.NetworkNodeRequester;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
-import com.buuz135.refinedstoragerequestify.proxy.client.GuiHandler;
-import com.raoulvdberge.refinedstorage.block.BlockNode;
-import com.raoulvdberge.refinedstorage.block.info.BlockInfoBuilder;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import com.buuz135.refinedstoragerequestify.proxy.client.ContainerRequester;
+import com.refinedmods.refinedstorage.api.network.node.INetworkNode;
+import com.refinedmods.refinedstorage.api.network.security.Permission;
+import com.refinedmods.refinedstorage.apiimpl.API;
+import com.refinedmods.refinedstorage.apiimpl.network.node.NetworkNode;
+import com.refinedmods.refinedstorage.block.NetworkNodeBlock;
+import com.refinedmods.refinedstorage.container.factory.PositionalTileContainerProvider;
+import com.refinedmods.refinedstorage.util.BlockUtils;
+import com.refinedmods.refinedstorage.util.NetworkUtils;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.network.NetworkHooks;
 
-public class BlockRequester extends BlockNode {
+public class BlockRequester extends NetworkNodeBlock {
 
     public BlockRequester() {
-        super(BlockInfoBuilder.forMod(RefinedStorageRequestify.INSTANCE, RefinedStorageRequestify.MOD_ID, NetworkNodeRequester.ID).material(Material.IRON).soundType(SoundType.METAL).hardness(0.35F).tileEntity(TileRequester::new).create());
-        GameRegistry.registerTileEntity(TileRequester.class, this.getRegistryName());
-        setCreativeTab(RefinedStorageRequestify.TAB);
+        super(BlockUtils.DEFAULT_ROCK_PROPERTIES);
+        setRegistryName(RefinedStorageRequestify.MOD_ID, "requester");
+        API.instance().getNetworkNodeRegistry().add(NetworkNodeRequester.ID, (compoundNBT, world, blockPos) -> readAndReturn(compoundNBT, new NetworkNodeRequester(world, blockPos)));
+        //setCreativeTab(RefinedStorageRequestify.TAB);
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        return openNetworkGui(GuiHandler.REQUESTER, player, world, pos, side);
+    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+        return new TileRequester();
     }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        if (!world.isRemote) {
+            return NetworkUtils.attempt(world, pos, hit.getFace(), player, () -> NetworkHooks.openGui(
+                    (ServerPlayerEntity) player,
+                    new PositionalTileContainerProvider<TileRequester>(
+                            new TranslationTextComponent("block.refinedstoragerequestify:requester.name"),
+                            (tile, windowId, inventory, p) -> new ContainerRequester(tile, player, windowId),
+                            pos
+                    ),
+                    pos
+            ), Permission.MODIFY, Permission.INSERT, Permission.EXTRACT);
+        }
+
+        return ActionResultType.SUCCESS;
+    }
+
 
     @Override
     public boolean hasConnectedState() {
         return true;
+    }
+
+    private INetworkNode readAndReturn(CompoundNBT tag, NetworkNode node) {
+        node.read(tag);
+
+        return node;
     }
 }

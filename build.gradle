@@ -1,13 +1,20 @@
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
+        maven { url = "https://files.minecraftforge.net/maven" }
         maven {
-            name = "forge"
-            url = "https://files.minecraftforge.net/maven"
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    configurations {
+        classpath.resolutionStrategy {
+            cacheDynamicVersionsFor 10, 'seconds'
+            cacheChangingModulesFor 0, 'seconds'
         }
     }
     dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
         classpath 'com.selesse:gradle-git-changelog:0.2.+'
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
     }
@@ -16,7 +23,7 @@ plugins {
     id "com.github.hierynomus.license" version "0.14.0"
     id "com.matthewprenger.cursegradle" version "1.1.0"
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'com.selesse.git.changelog'
 apply plugin: 'java'
 
@@ -37,46 +44,90 @@ if (b == null || b == "") {
 }
 
 minecraft {
-    version = project.forgeVersion
-    runDir = "run"
-
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
+    // The mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   Snapshot are built nightly.
+    // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = project.mcpVersion
+    // Simply re-run your setup task after changing the mappings to update your workspace.
+    mappings channel: 'snapshot', version: '20200916-1.16.2'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+
+    //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    // Default run configurations.
+    // These can be tweaked, removed, or duplicated as needed.
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            //property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                seals {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                seals {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            args '--mod', 'seals', '--all', '--output', file('src/generated/resources/')
+
+            mods {
+                seals {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
 }
 
 repositories {
     mavenCentral()
     maven {
-        url "https://repo.raoulvdberge.com"
+        url "https://repo.refinedmods.com"
+    }
+    maven {
+        // location of the maven that hosts JEI files
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
     }
 }
 
 dependencies {
-    deobfCompile "refinedstorage:refinedstorage:1.6.14-375"
-}
-
-processResources {
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include "mcmod.info"
-
-        // replace version and mcversion
-        expand "version": project.version, "mcversion": project.minecraft.version
-    }
-
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude "mcmod.info"
-    }
+    minecraft 'net.minecraftforge:forge:1.16.3-34.1.0'
+    compileOnly fg.deobf("com.refinedmods:refinedstorage:1.9.6+80")
+    runtimeOnly fg.deobf("com.refinedmods:refinedstorage:1.9.6+80")
+    compileOnly fg.deobf("mezz.jei:jei-1.16.3:7.5.0.42:api")
+    // at runtime, use the full JEI jar
+    runtimeOnly fg.deobf("mezz.jei:jei-1.16.3:7.5.0.42")
 }
 
 changelog {
@@ -117,8 +168,7 @@ curseforge {
                 requiredDependency 'refined-storage'
             }
         }
-        
-        addArtifact sourceJar
+
     }
 }
 
@@ -131,5 +181,20 @@ license {
     ignoreFailures = true
     mapping {
         java='SLASHSTAR_STYLE'
+    }
+}
+
+jar {
+    manifest {
+        attributes(["Specification-Title": project.name,
+                    "Specification-Vendor": "Buuz135",
+                    "Specification-Version": "1.0",
+                    "Implementation-Title": project.name,
+                    "Implementation-Version": "${project.mod_version}",
+                    "Implementation-Vendor" :"Buuz135",
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                    "ModSide": "BOTH",
+        ],)
+
     }
 }

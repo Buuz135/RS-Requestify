@@ -13,18 +13,16 @@
       "item": "refinedstorage:detector"
     },
     "C": {
-      "item": "refinedstorage:upgrade",
-      "data": 3
+      "item": "refinedstorage:crafting_upgrade"
     },
     "F": {
       "item": "refinedstorage:machine_casing"
     },
     "P": {
-      "item":"refinedstorage:processor",
-      "data": 5
+      "item": "refinedstorage:advanced_processor"
     }
   },
   "result": {
-    "item": "refinedstoragerequestify:requester"
+    "item": "rsrequestify:requester"
   }
 }
