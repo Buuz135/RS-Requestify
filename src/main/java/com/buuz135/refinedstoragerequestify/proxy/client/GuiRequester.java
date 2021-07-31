@@ -26,22 +26,22 @@ import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerRequester;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.refinedmods.refinedstorage.RS;
+import com.refinedmods.refinedstorage.render.RenderSettings;
 import com.refinedmods.refinedstorage.screen.BaseScreen;
 import com.refinedmods.refinedstorage.screen.widget.sidebutton.RedstoneModeSideButton;
 import com.refinedmods.refinedstorage.screen.widget.sidebutton.TypeSideButton;
+import com.refinedmods.refinedstorage.tile.DetectorTile;
 import com.refinedmods.refinedstorage.tile.data.TileDataManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import org.apache.commons.lang3.math.NumberUtils;
+import org.lwjgl.glfw.GLFW;
 
 public class GuiRequester extends BaseScreen<ContainerRequester> {
 
     private TextFieldWidget textField;
-    private Button button;
 
     public GuiRequester(ContainerRequester container) {
         super(container, 211, 137, container.getPlayer().inventory, new TranslationTextComponent("block.refinedstoragerequestify:requester.name"));
@@ -49,20 +49,13 @@ public class GuiRequester extends BaseScreen<ContainerRequester> {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 1) {
-            this.minecraft.player.closeScreen();
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+            minecraft.player.closeScreen();
+            return true;
         }
-        textField.charTyped((char) keyCode, modifiers);
-        StringBuilder builder = new StringBuilder();
-        int pos = 0;
-        for (char c : textField.getText().toCharArray()) {
-            if (pos == 0 && c == '0' && textField.getText().length() > 1) {
-                continue;
-            }
-            if (NumberUtils.isCreatable(c + "")) builder = builder.append(c);
-            ++pos;
+        if (textField.keyPressed(keyCode, scanCode, modifiers) || textField.canWrite()) {
+            return true;
         }
-        textField.setText(builder.toString());
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
@@ -73,15 +66,22 @@ public class GuiRequester extends BaseScreen<ContainerRequester> {
         addSideButton(new TypeSideButton(this, TileRequester.TYPE));
         textField = new TextFieldWidget(Minecraft.getInstance().fontRenderer, x + 20 + 18, y + 23, 80, 10, new StringTextComponent(""));
         textField.setText(TileRequester.AMOUNT.getValue() + "");
+        textField.setText(String.valueOf(DetectorTile.AMOUNT.getValue()));
+        //textField.setEnableBackgroundDrawing(false);
+        textField.setVisible(true);
         textField.setCanLoseFocus(true);
-        textField.setFocused2(true);
-        button = addButton(x + 40 + 86, y + 19, 40, 20, new TranslationTextComponent("button.refinedstoragerequestify:requester.save"), true, true, p_onPress_1_ -> {
-            if (NumberUtils.isCreatable(textField.getText())) {
-                long amount = NumberUtils.createLong(textField.getText());
-                if (amount > Integer.MAX_VALUE) amount = Integer.MAX_VALUE;
-                TileDataManager.setParameter(TileRequester.AMOUNT, (int) amount);
+        textField.setFocused2(false);
+        textField.setTextColor(RenderSettings.INSTANCE.getSecondaryColor());
+        textField.setResponder(value -> {
+            try {
+                int result = Integer.parseInt(value);
+
+                TileDataManager.setParameter(TileRequester.AMOUNT, result);
+            } catch (NumberFormatException e) {
+                // NO OP
             }
         });
+        addButton(textField);
     }
 
     public TextFieldWidget getTextField() {
