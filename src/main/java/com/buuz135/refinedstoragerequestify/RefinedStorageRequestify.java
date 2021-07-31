@@ -24,6 +24,7 @@ package com.buuz135.refinedstoragerequestify;
 import com.buuz135.refinedstoragerequestify.proxy.CommonProxy;
 import com.buuz135.refinedstoragerequestify.proxy.client.GuiCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.client.GuiRequester;
+import com.buuz135.refinedstoragerequestify.proxy.config.RequestifyConfig;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerRequester;
 import net.minecraft.block.Block;
@@ -35,7 +36,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
@@ -61,6 +65,9 @@ public class RefinedStorageRequestify {
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(TileEntityType.class, proxy::registerTiles);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(ContainerType.class, proxy::registerContainers);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, RequestifyConfig.COMMON.SPEC);
+        IEventBus mod = FMLJavaModLoadingContext.get().getModEventBus();
+        mod.addListener(RequestifyConfig.COMMON::onConfigReload);
     }
 
     public void onClientSetup(FMLClientSetupEvent event) {
