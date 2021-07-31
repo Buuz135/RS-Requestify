@@ -50,13 +50,14 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
     private static final String NBT_AMOUNT = "Amount";
     private static final String NBT_MISSING = "MissingItems";
 
-    private BaseItemHandler itemFilter = new BaseItemHandler(1).addListener(new NetworkNodeInventoryListener(this));
-    private FluidInventory fluidFilter = new FluidInventory(1).addListener(new NetworkNodeFluidInventoryListener(this));
+    private BaseItemHandler itemFilter = new BaseItemHandler(9).addListener(new NetworkNodeInventoryListener(this));
+    private FluidInventory fluidFilter = new FluidInventory(9).addListener(new NetworkNodeFluidInventoryListener(this));
 
     private int type = IType.ITEMS;
     private int amount = 0;
+    private int slot = 0;
     private boolean isMissingItems = false;
-    private int attemptAmount = RequestifyConfig.MAX_CRAFT_AMOUNT;
+    private int attemptAmount = RequestifyConfig.COMMON.MAX_CRAFT_AMOUNT.get();
     private ICraftingTask craftingTask = null;
 
     public NetworkNodeRequester(World world, BlockPos pos) {
@@ -67,34 +68,50 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
     public void update() {
         super.update();
         if (network == null) return;
-        if (canUpdate() && ticks % 10 == 0 && (craftingTask == null || !network.getCraftingManager().getTasks().contains(craftingTask))) {
-            if (attemptAmount > amount) {
-                attemptAmount = amount;
-            }
-            if (craftingTask == null) {
-                if (attemptAmount <= 1) {
-                    attemptAmount = RequestifyConfig.MAX_CRAFT_AMOUNT;
-                }
-                attemptAmount /= 2;
-            }
+        if (canUpdate() && ticks % 60 == 0 && (craftingTask == null || !network.getCraftingManager().getTasks().contains(craftingTask))) {
             if (type == IType.ITEMS) {
-                ItemStack filter = itemFilter.getStackInSlot(0);
+                while (itemFilter.getStackInSlot(slot).isEmpty() && slot < itemFilter.getSlots()) {
+                    ++slot;
+                }
+                if (slot >= itemFilter.getSlots()) {
+                    slot = 0;
+                }
+                ItemStack filter = itemFilter.getStackInSlot(slot);
                 if (!filter.isEmpty()) {
                     ItemStack current = network.extractItem(filter, amount, Action.SIMULATE);
                     if (current == null || current.isEmpty() || current.getCount() < amount) {
                         int count = current == null || current.isEmpty() ? amount : amount - current.getCount();
                         if (count > 0) {
                             craftingTask = network.getCraftingManager().request(this, filter, Math.min(attemptAmount, count));
-
                             isMissingItems = true;
                         }
                     } else {
                         isMissingItems = false;
                     }
                 }
+                ++slot;
+                if (slot >= itemFilter.getSlots()) {
+                    slot = 0;
+                }
+                if (attemptAmount > amount) {
+                    attemptAmount = amount;
+                }
+                if (slot == 0) {
+                    if (attemptAmount <= 1) {
+                        attemptAmount = RequestifyConfig.COMMON.MAX_CRAFT_AMOUNT.get();
+                    } else {
+                        attemptAmount /= 2;
+                    }
+                }
             }
             if (type == IType.FLUIDS) {
-                FluidStack filter = fluidFilter.getFluid(0);
+                while (fluidFilter.getFluid(slot).isEmpty() && slot < fluidFilter.getSlots()) {
+                    ++slot;
+                }
+                if (slot >= fluidFilter.getSlots()) {
+                    slot = 0;
+                }
+                FluidStack filter = fluidFilter.getFluid(slot);
                 if (!filter.isEmpty()) {
                     FluidStack current = network.extractFluid(filter, amount, Action.SIMULATE);
                     if (current.isEmpty() || current.getAmount() < amount) {
@@ -105,6 +122,20 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
                         }
                     } else {
                         isMissingItems = false;
+                    }
+                }
+                ++slot;
+                if (slot >= itemFilter.getSlots()) {
+                    slot = 0;
+                }
+                if (attemptAmount > amount) {
+                    attemptAmount = amount;
+                }
+                if (slot == 0) {
+                    if (attemptAmount <= 1) {
+                        attemptAmount = RequestifyConfig.COMMON.MAX_CRAFT_AMOUNT.get();
+                    } else {
+                        attemptAmount /= 2;
                     }
                 }
             }

@@ -33,8 +33,12 @@ public class ContainerRequester extends BaseContainer {
 
     public ContainerRequester(TileRequester tile, PlayerEntity player, int windowid) {
         super(CommonProxy.REQUESTER_CONTAINER, tile, player, windowid);
-        addSlot(new FilterSlot(tile.getNode().getItemFilters(), 0, 17, 20).setEnableHandler(() -> tile.getNode().getType() == IType.ITEMS));
-        addSlot(new FluidFilterSlot(tile.getNode().getFluidFilters(), 0, 17, 20).setEnableHandler(() -> tile.getNode().getType() == IType.FLUIDS));
+        for (int i = 0; i < 9; ++i) {
+            addSlot(new FilterSlot(tile.getNode().getItemFilters(), i, 8 + (18 * i), 20).setEnableHandler(() -> tile.getNode().getType() == IType.ITEMS));
+        }
+        for (int i = 0; i < 9; ++i) {
+            addSlot(new FluidFilterSlot(tile.getNode().getFluidFilters(), i, 8 + (18 * i), 20).setEnableHandler(() -> tile.getNode().getType() == IType.FLUIDS));
+        }
         addPlayerInventory(8, 55);
         transferManager.addFilterTransfer(player.inventory, tile.getNode().getItemFilters(), tile.getNode().getFluidFilters(), tile.getNode()::getType);
     }

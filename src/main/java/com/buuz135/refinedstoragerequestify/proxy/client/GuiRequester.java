@@ -64,7 +64,7 @@ public class GuiRequester extends BaseScreen<ContainerRequester> {
     public void onPostInit(int x, int y) {
         addSideButton(new RedstoneModeSideButton(this, TileRequester.REDSTONE_MODE));
         addSideButton(new TypeSideButton(this, TileRequester.TYPE));
-        textField = new TextFieldWidget(Minecraft.getInstance().fontRenderer, x + 20 + 18, y + 23, 80, 10, new StringTextComponent(""));
+        textField = new TextFieldWidget(Minecraft.getInstance().fontRenderer, x + 86, y + 41, 80, 10, new StringTextComponent(""));
         textField.setText(TileRequester.AMOUNT.getValue() + "");
         textField.setText(String.valueOf(DetectorTile.AMOUNT.getValue()));
         //textField.setEnableBackgroundDrawing(false);
