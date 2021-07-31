@@ -22,9 +22,12 @@
 package com.buuz135.refinedstoragerequestify.proxy;
 
 import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
+import com.buuz135.refinedstoragerequestify.proxy.block.BlockCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.block.BlockRequester;
+import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
-import com.buuz135.refinedstoragerequestify.proxy.client.ContainerRequester;
+import com.buuz135.refinedstoragerequestify.proxy.container.ContainerCraftingEmitter;
+import com.buuz135.refinedstoragerequestify.proxy.container.ContainerRequester;
 import com.refinedmods.refinedstorage.container.factory.PositionalTileContainerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.container.ContainerType;
@@ -38,22 +41,31 @@ import net.minecraftforge.event.RegistryEvent;
 public class CommonProxy {
 
     public static BlockRequester REQUESTER;
-    public static ContainerType<ContainerRequester> CONTAINER = null;
-    public static TileEntityType<?> TYPE;
+    public static ContainerType<ContainerRequester> REQUESTER_CONTAINER = null;
+    public static TileEntityType<?> REQUESTER_TYPE;
+
+    public static BlockCraftingEmitter CRAFTING_EMITTER;
+    public static TileEntityType<?> CRAFTING_EMITTER_TYPE;
+    public static ContainerType<ContainerCraftingEmitter> CRAFTING_EMITTER_CONTAINER = null;
 
     public void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(REQUESTER = new BlockRequester());
+        event.getRegistry().register(CRAFTING_EMITTER = new BlockCraftingEmitter());
     }
 
     public void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(new BlockItem(REQUESTER, new Item.Properties().group(RefinedStorageRequestify.TAB)).setRegistryName(REQUESTER.getRegistryName()));
+        event.getRegistry().register(new BlockItem(CRAFTING_EMITTER, new Item.Properties().group(RefinedStorageRequestify.TAB)).setRegistryName(CRAFTING_EMITTER.getRegistryName()));
     }
 
     public void registerTiles(RegistryEvent.Register<TileEntityType<?>> event) {
-        event.getRegistry().register(TYPE = TileEntityType.Builder.create(TileRequester::new, REQUESTER).build(null).setRegistryName(REQUESTER.getRegistryName()));
+        event.getRegistry().register(REQUESTER_TYPE = TileEntityType.Builder.create(TileRequester::new, REQUESTER).build(null).setRegistryName(REQUESTER.getRegistryName()));
+        event.getRegistry().register(CRAFTING_EMITTER_TYPE = TileEntityType.Builder.create(TileCraftingEmitter::new, CRAFTING_EMITTER).build(null).setRegistryName(CRAFTING_EMITTER.getRegistryName()));
     }
 
     public void registerContainers(RegistryEvent.Register<ContainerType<?>> event) {
-        event.getRegistry().register(CONTAINER = (ContainerType<ContainerRequester>) IForgeContainerType.create(new PositionalTileContainerFactory<ContainerRequester, TileRequester>((i, playerInventory, tileRequester) -> new ContainerRequester(tileRequester, playerInventory.player, i))).setRegistryName(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "requester")));
+        event.getRegistry().register(REQUESTER_CONTAINER = (ContainerType<ContainerRequester>) IForgeContainerType.create(new PositionalTileContainerFactory<ContainerRequester, TileRequester>((i, playerInventory, tileRequester) -> new ContainerRequester(tileRequester, playerInventory.player, i))).setRegistryName(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "requester")));
+        event.getRegistry().register(CRAFTING_EMITTER_CONTAINER = (ContainerType<ContainerCraftingEmitter>) IForgeContainerType.create(new PositionalTileContainerFactory<ContainerCraftingEmitter, TileCraftingEmitter>((i, playerInventory, tile) -> new ContainerCraftingEmitter(tile, playerInventory.player, i))).setRegistryName(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "crafting_emitter")));
+
     }
 }

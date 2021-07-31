@@ -23,6 +23,7 @@ package com.buuz135.refinedstoragerequestify.proxy.client;
 
 import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
+import com.buuz135.refinedstoragerequestify.proxy.container.ContainerRequester;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.refinedmods.refinedstorage.RS;
 import com.refinedmods.refinedstorage.screen.BaseScreen;

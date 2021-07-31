@@ -24,7 +24,7 @@ package com.buuz135.refinedstoragerequestify.proxy.block;
 import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.block.network.NetworkNodeRequester;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
-import com.buuz135.refinedstoragerequestify.proxy.client.ContainerRequester;
+import com.buuz135.refinedstoragerequestify.proxy.container.ContainerRequester;
 import com.refinedmods.refinedstorage.api.network.node.INetworkNode;
 import com.refinedmods.refinedstorage.api.network.security.Permission;
 import com.refinedmods.refinedstorage.apiimpl.API;
@@ -75,7 +75,6 @@ public class BlockRequester extends NetworkNodeBlock {
                     pos
             ), Permission.MODIFY, Permission.INSERT, Permission.EXTRACT);
         }
-
         return ActionResultType.SUCCESS;
     }
 

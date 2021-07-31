@@ -22,10 +22,14 @@
 package com.buuz135.refinedstoragerequestify;
 
 import com.buuz135.refinedstoragerequestify.proxy.CommonProxy;
-import com.buuz135.refinedstoragerequestify.proxy.client.ContainerRequester;
+import com.buuz135.refinedstoragerequestify.proxy.client.GuiCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.client.GuiRequester;
+import com.buuz135.refinedstoragerequestify.proxy.container.ContainerCraftingEmitter;
+import com.buuz135.refinedstoragerequestify.proxy.container.ContainerRequester;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -60,7 +64,9 @@ public class RefinedStorageRequestify {
     }
 
     public void onClientSetup(FMLClientSetupEvent event) {
-        ScreenManager.registerFactory(CommonProxy.CONTAINER, (ScreenManager.IScreenFactory<ContainerRequester, GuiRequester>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiRequester(p_create_1_));
+        ScreenManager.registerFactory(CommonProxy.REQUESTER_CONTAINER, (ScreenManager.IScreenFactory<ContainerRequester, GuiRequester>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiRequester(p_create_1_));
+        ScreenManager.registerFactory(CommonProxy.CRAFTING_EMITTER_CONTAINER, (ScreenManager.IScreenFactory<ContainerCraftingEmitter, GuiCraftingEmitter>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiCraftingEmitter(p_create_1_));
+        RenderTypeLookup.setRenderLayer(CommonProxy.CRAFTING_EMITTER, RenderType.getCutout());
     }
 
 

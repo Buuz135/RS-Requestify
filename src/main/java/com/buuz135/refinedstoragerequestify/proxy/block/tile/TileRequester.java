@@ -52,7 +52,7 @@ public class TileRequester extends NetworkNodeTile<NetworkNodeRequester> {
     }
 
     public TileRequester() {
-        super(CommonProxy.TYPE);
+        super(CommonProxy.REQUESTER_TYPE);
         dataManager.addWatchedParameter(TYPE);
         dataManager.addWatchedParameter(AMOUNT);
         dataManager.addParameter(MISSING);

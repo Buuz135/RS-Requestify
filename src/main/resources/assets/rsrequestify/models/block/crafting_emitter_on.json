@@ -1,0 +1,7 @@
+{
+  "parent": "refinedstorage:block/detector",
+  "textures": {
+    "torch": "refinedstorage:block/detector/cutouts/red",
+    "side": "rsrequestify:block/crafting_emitter/side"
+  }
+}

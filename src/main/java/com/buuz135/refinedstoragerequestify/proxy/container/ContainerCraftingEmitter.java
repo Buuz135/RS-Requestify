@@ -19,22 +19,26 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.buuz135.refinedstoragerequestify.proxy.client;
+package com.buuz135.refinedstoragerequestify.proxy.container;
 
 import com.buuz135.refinedstoragerequestify.proxy.CommonProxy;
-import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
+import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileCraftingEmitter;
 import com.refinedmods.refinedstorage.container.BaseContainer;
 import com.refinedmods.refinedstorage.container.slot.filter.FilterSlot;
 import com.refinedmods.refinedstorage.container.slot.filter.FluidFilterSlot;
 import com.refinedmods.refinedstorage.tile.config.IType;
 import net.minecraft.entity.player.PlayerEntity;
 
-public class ContainerRequester extends BaseContainer {
+public class ContainerCraftingEmitter extends BaseContainer {
 
-    public ContainerRequester(TileRequester tile, PlayerEntity player, int windowid) {
-        super(CommonProxy.CONTAINER, tile, player, windowid);
-        addSlot(new FilterSlot(tile.getNode().getItemFilters(), 0, 17, 20).setEnableHandler(() -> tile.getNode().getType() == IType.ITEMS));
-        addSlot(new FluidFilterSlot(tile.getNode().getFluidFilters(), 0, 17, 20).setEnableHandler(() -> tile.getNode().getType() == IType.FLUIDS));
+    public ContainerCraftingEmitter(TileCraftingEmitter tile, PlayerEntity player, int windowid) {
+        super(CommonProxy.CRAFTING_EMITTER_CONTAINER, tile, player, windowid);
+        for (int i = 0; i < 9; ++i) {
+            addSlot(new FilterSlot(tile.getNode().getItemFilters(), i, 8 + (18 * i), 20).setEnableHandler(() -> tile.getNode().getType() == IType.ITEMS));
+        }
+        for (int i = 0; i < 9; ++i) {
+            addSlot(new FluidFilterSlot(tile.getNode().getFluidFilters(), i, 8 + (18 * i), 20).setEnableHandler(() -> tile.getNode().getType() == IType.FLUIDS));
+        }
         addPlayerInventory(8, 55);
         transferManager.addFilterTransfer(player.inventory, tile.getNode().getItemFilters(), tile.getNode().getFluidFilters(), tile.getNode()::getType);
     }

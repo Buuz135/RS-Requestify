@@ -14,7 +14,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath 'com.selesse:gradle-git-changelog:0.2.+'
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
     }
@@ -24,7 +24,7 @@ plugins {
     id "com.matthewprenger.cursegradle" version "1.1.0"
 }
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'com.selesse.git.changelog'
+//apply plugin: 'com.selesse.git.changelog'
 apply plugin: 'java'
 
 
@@ -130,6 +130,7 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-1.16.3:7.5.0.42")
 }
 
+/*
 changelog {
     title = "RS: Requestify"
     fileName = "CHANGELOG.md"
@@ -149,9 +150,9 @@ changelog {
         }
         input
     }
-}
+}*/
 
-tasks.curseforge.enabled =  project.hasProperty('curse_api')
+tasks.curseforge.enabled = project.hasProperty('curse_api')
 
 curseforge {
     if (project.hasProperty('curse_api')) {
@@ -163,7 +164,7 @@ curseforge {
         changelogType = 'markdown'
         releaseType = 'beta'
 
-        mainArtifact(jar){
+        mainArtifact(jar) {
             relations {
                 requiredDependency 'refined-storage'
             }
@@ -177,24 +178,31 @@ license {
     include "**/*.java"
     ext.year = Calendar.getInstance().get(Calendar.YEAR)
     ext.name = 'Buuz135'
-    ext.mod= 'RS: Requestify'
+    ext.mod = 'RS: Requestify'
     ignoreFailures = true
     mapping {
-        java='SLASHSTAR_STYLE'
+        java = 'SLASHSTAR_STYLE'
     }
 }
 
 jar {
     manifest {
-        attributes(["Specification-Title": project.name,
-                    "Specification-Vendor": "Buuz135",
-                    "Specification-Version": "1.0",
-                    "Implementation-Title": project.name,
-                    "Implementation-Version": "${project.mod_version}",
-                    "Implementation-Vendor" :"Buuz135",
+        attributes(["Specification-Title"     : project.name,
+                    "Specification-Vendor"    : "Buuz135",
+                    "Specification-Version"   : "1.0",
+                    "Implementation-Title"    : project.name,
+                    "Implementation-Version"  : "${project.mod_version}",
+                    "Implementation-Vendor"   : "Buuz135",
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                    "ModSide": "BOTH",
+                    "ModSide"                 : "BOTH",
         ],)
 
     }
 }
+
+tasks.withType(JavaCompile).configureEach {
+    if (JavaVersion.current().isJava9Compatible()) {
+        it.options.release = 8
+    }
+}
+

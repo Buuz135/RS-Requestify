@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=true": {
+      "model": "rsrequestify:block/crafting_emitter_on"
+    },
+    "powered=false": {
+      "model": "rsrequestify:block/crafting_emitter_off"
+    }
+  }
+}
