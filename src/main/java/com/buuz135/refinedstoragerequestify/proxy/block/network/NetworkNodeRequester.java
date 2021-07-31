@@ -56,6 +56,7 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
     private int type = IType.ITEMS;
     private int amount = 0;
     private boolean isMissingItems = false;
+    private int attemptAmount = RequestifyConfig.MAX_CRAFT_AMOUNT;
     private ICraftingTask craftingTask = null;
 
     public NetworkNodeRequester(World world, BlockPos pos) {
@@ -67,6 +68,15 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
         super.update();
         if (network == null) return;
         if (canUpdate() && ticks % 10 == 0 && (craftingTask == null || !network.getCraftingManager().getTasks().contains(craftingTask))) {
+            if (attemptAmount > amount) {
+                attemptAmount = amount;
+            }
+            if (craftingTask == null) {
+                if (attemptAmount <= 1) {
+                    attemptAmount = RequestifyConfig.MAX_CRAFT_AMOUNT;
+                }
+                attemptAmount /= 2;
+            }
             if (type == IType.ITEMS) {
                 ItemStack filter = itemFilter.getStackInSlot(0);
                 if (!filter.isEmpty()) {
@@ -74,7 +84,8 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
                     if (current == null || current.isEmpty() || current.getCount() < amount) {
                         int count = current == null || current.isEmpty() ? amount : amount - current.getCount();
                         if (count > 0) {
-                            craftingTask = network.getCraftingManager().request(this, filter, Math.min(RequestifyConfig.MAX_CRAFT_AMOUNT, count));
+                            craftingTask = network.getCraftingManager().request(this, filter, Math.min(attemptAmount, count));
+
                             isMissingItems = true;
                         }
                     } else {
