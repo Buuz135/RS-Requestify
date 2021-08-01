@@ -71,7 +71,7 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
         if (network == null) return;
         if (canUpdate() && ticks % 60 == 0 && (craftingTask == null || !network.getCraftingManager().getTasks().contains(craftingTask))) {
             if (type == IType.ITEMS) {
-                while (itemFilter.getStackInSlot(slot).isEmpty() && slot < itemFilter.getSlots()) {
+                while (slot < itemFilter.getSlots() && itemFilter.getStackInSlot(slot).isEmpty()) {
                     ++slot;
                 }
                 if (slot >= itemFilter.getSlots()) {
@@ -106,7 +106,7 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
                 }
             }
             if (type == IType.FLUIDS) {
-                while (fluidFilter.getFluid(slot).isEmpty() && slot < fluidFilter.getSlots()) {
+                while (slot < fluidFilter.getSlots() && fluidFilter.getFluid(slot).isEmpty()) {
                     ++slot;
                 }
                 if (slot >= fluidFilter.getSlots()) {
@@ -126,7 +126,7 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
                     }
                 }
                 ++slot;
-                if (slot >= itemFilter.getSlots()) {
+                if (slot >= fluidFilter.getSlots()) {
                     slot = 0;
                 }
                 if (attemptAmount > amount) {
