@@ -71,7 +71,7 @@ public class NetworkNodeCraftingEmitter extends NetworkNode implements IType {
             if (type == IType.ITEMS) {
                 for (ICraftingTask task : network.getCraftingManager().getTasks()) {
                     for (int i = 0; i < itemFilter.getSlots(); i++) {
-                        if (task.getRequested().getItem().isItemEqual(itemFilter.getStackInSlot(i))) {
+                        if (task.getRequested().getItem() != null && task.getRequested().getItem().isItemEqual(itemFilter.getStackInSlot(i))) {
                             this.craftingTask = task;
                             updateState();
                             break;
@@ -82,7 +82,7 @@ public class NetworkNodeCraftingEmitter extends NetworkNode implements IType {
             if (type == IType.FLUIDS) {
                 for (ICraftingTask task : network.getCraftingManager().getTasks()) {
                     for (int i = 0; i < fluidFilter.getSlots(); i++) {
-                        if (task.getRequested().getFluid().isFluidEqual(fluidFilter.getFluid(i))) {
+                        if (task.getRequested().getFluid() != null && task.getRequested().getFluid().isFluidEqual(fluidFilter.getFluid(i))) {
                             this.craftingTask = task;
                             updateState();
                             break;
