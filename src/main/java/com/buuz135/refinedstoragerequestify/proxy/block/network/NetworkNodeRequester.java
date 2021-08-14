@@ -69,7 +69,7 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
     public void update() {
         super.update();
         if (network == null) return;
-        if (canUpdate() && ticks % 60 == 0 && (craftingTask == null || !network.getCraftingManager().getTasks().contains(craftingTask))) {
+        if (canUpdate() && ticks % 70 == 0 && (craftingTask == null || !network.getCraftingManager().getTasks().contains(craftingTask))) {
             if (type == IType.ITEMS) {
                 while (slot < itemFilter.getSlots() && itemFilter.getStackInSlot(slot).isEmpty()) {
                     ++slot;
@@ -90,10 +90,6 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
                         isMissingItems = false;
                     }
                 }
-                ++slot;
-                if (slot >= itemFilter.getSlots()) {
-                    slot = 0;
-                }
                 if (attemptAmount > amount) {
                     attemptAmount = amount;
                 }
@@ -103,6 +99,10 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
                     } else {
                         attemptAmount /= 2;
                     }
+                }
+                ++slot;
+                if (slot >= itemFilter.getSlots()) {
+                    slot = 0;
                 }
             }
             if (type == IType.FLUIDS) {
@@ -125,10 +125,6 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
                         isMissingItems = false;
                     }
                 }
-                ++slot;
-                if (slot >= fluidFilter.getSlots()) {
-                    slot = 0;
-                }
                 if (attemptAmount > amount) {
                     attemptAmount = amount;
                 }
@@ -138,6 +134,10 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
                     } else {
                         attemptAmount /= 2;
                     }
+                }
+                ++slot;
+                if (slot >= fluidFilter.getSlots()) {
+                    slot = 0;
                 }
             }
         }
