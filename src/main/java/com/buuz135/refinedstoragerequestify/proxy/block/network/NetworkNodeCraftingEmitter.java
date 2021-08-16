@@ -64,7 +64,7 @@ public class NetworkNodeCraftingEmitter extends NetworkNode implements IType {
         super.update();
         if (network == null) return;
         if (canUpdate() && ticks % 4 == 0 && (craftingTask == null || !network.getCraftingManager().getTasks().contains(craftingTask))) {
-            if (craftingTask != null && craftingTask.getCompletionPercentage() == 100) {
+            if (craftingTask != null && (craftingTask.getCompletionPercentage() == 100 || !network.getCraftingManager().getTasks().contains(craftingTask))) {
                 this.craftingTask = null;
                 updateState();
             }
