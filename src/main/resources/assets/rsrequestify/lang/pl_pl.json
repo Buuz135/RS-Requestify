@@ -1,0 +1,9 @@
+{
+  "itemGroup.rsrequestify": "RS: Requestify",
+  "block.rsrequestify.requester": "Menadżer ilości przedmiotów",
+  "button.refinedstoragerequestify:requester.save": "Zapisz",
+  "tooltip.refinedstoragerequestify:requester.missing": "Brakuje któregoś ze składników",
+  "block.rsrequestify.crafting_emitter": "Emiter konstruowania",
+  "block.rsrequestify.crafting_emitter.tooltip": "Emituje sygnał redstone, kiedy dowolny przedmiot jest automatycznie wytwarzany.",
+  "block.rsrequestify.requester.tooltip": "Utrzymuje wybrany przedmiot na stałym, minimalnym poziomie."
+}
