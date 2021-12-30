@@ -1,0 +1,9 @@
+{
+  "itemGroup.rsrequestify": "리파인드 스토리지 리퀘스티파이",
+  "block.rsrequestify.requester": "요청기",
+  "button.refinedstoragerequestify:requester.save": "저장",
+  "tooltip.refinedstoragerequestify:requester.missing": "누락된 구성 요소",
+  "block.rsrequestify.crafting_emitter": "제작 방출기",
+  "block.rsrequestify.crafting_emitter.tooltip": "필터의 아이템/액체가 제작된 경우 레드스톤 신호를 방출합니다.",
+  "block.rsrequestify.requester.tooltip": "필터링된 아이템/액체를 원하는 양만큼 보관합니다."
+}
