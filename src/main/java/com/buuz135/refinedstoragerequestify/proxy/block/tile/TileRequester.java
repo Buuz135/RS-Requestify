@@ -25,48 +25,47 @@ package com.buuz135.refinedstoragerequestify.proxy.block.tile;
 import com.buuz135.refinedstoragerequestify.proxy.CommonProxy;
 import com.buuz135.refinedstoragerequestify.proxy.block.network.NetworkNodeRequester;
 import com.buuz135.refinedstoragerequestify.proxy.client.GuiRequester;
-import com.refinedmods.refinedstorage.tile.NetworkNodeTile;
-import com.refinedmods.refinedstorage.tile.config.IType;
-import com.refinedmods.refinedstorage.tile.data.TileDataManager;
-import com.refinedmods.refinedstorage.tile.data.TileDataParameter;
+import com.refinedmods.refinedstorage.blockentity.NetworkNodeBlockEntity;
+import com.refinedmods.refinedstorage.blockentity.config.IType;
+import com.refinedmods.refinedstorage.blockentity.data.BlockEntitySynchronizationManager;
+import com.refinedmods.refinedstorage.blockentity.data.BlockEntitySynchronizationParameter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
-public class TileRequester extends NetworkNodeTile<NetworkNodeRequester> {
+public class TileRequester extends NetworkNodeBlockEntity<NetworkNodeRequester> {
 
-    public static final TileDataParameter<Integer, TileRequester> TYPE = IType.createParameter();
-    public static final TileDataParameter<Integer, TileRequester> AMOUNT = new TileDataParameter<>(DataSerializers.VARINT, 0, t -> t.getNode().getAmount(), (t, v) -> t.getNode().setAmount(v), (initial, p) -> Minecraft.getInstance().enqueue(() -> {
-        if (Minecraft.getInstance().currentScreen instanceof GuiRequester) {
-            ((GuiRequester) Minecraft.getInstance().currentScreen).getTextField().setText(String.valueOf(p));
+    public static final BlockEntitySynchronizationParameter<Integer, TileRequester> TYPE = IType.createParameter();
+    public static final BlockEntitySynchronizationParameter<Integer, TileRequester> AMOUNT = new BlockEntitySynchronizationParameter<>(EntityDataSerializers.INT, 0, t -> t.getNode().getAmount(), (t, v) -> t.getNode().setAmount(v), (initial, p) -> Minecraft.getInstance().tell(() -> {
+        if (Minecraft.getInstance().screen instanceof GuiRequester) {
+            ((GuiRequester) Minecraft.getInstance().screen).getTextField().setValue(String.valueOf(p));
         }
     }));
-    public static final TileDataParameter<Boolean, TileRequester> MISSING = new TileDataParameter<>(DataSerializers.BOOLEAN, false, tileRequester -> tileRequester.getNode().isMissingItems(), (tileRequester, aBoolean) -> {
+    public static final BlockEntitySynchronizationParameter<Boolean, TileRequester> MISSING = new BlockEntitySynchronizationParameter<>(EntityDataSerializers.BOOLEAN, false, tileRequester -> tileRequester.getNode().isMissingItems(), (tileRequester, aBoolean) -> {
     });
 
     static {
-        TileDataManager.registerParameter(TYPE);
-        TileDataManager.registerParameter(AMOUNT);
-        TileDataManager.registerParameter(MISSING);
+        BlockEntitySynchronizationManager.registerParameter(TYPE);
+        BlockEntitySynchronizationManager.registerParameter(AMOUNT);
+        BlockEntitySynchronizationManager.registerParameter(MISSING);
     }
 
-    public TileRequester() {
-        super(CommonProxy.REQUESTER_TYPE);
+    public TileRequester(BlockPos pos, BlockState state) {
+        super(CommonProxy.REQUESTER_TYPE, pos, state);
         dataManager.addWatchedParameter(TYPE);
         dataManager.addWatchedParameter(AMOUNT);
         dataManager.addParameter(MISSING);
     }
 
     @Override
-    public NetworkNodeRequester createNode(World world, BlockPos pos) {
-        return new NetworkNodeRequester(world, pos);
+    public NetworkNodeRequester createNode(Level level, BlockPos pos) {
+        return new NetworkNodeRequester(level, pos);
     }
 
     public ResourceLocation getNodeId() {
         return NetworkNodeRequester.ID;
     }
-
-
 }

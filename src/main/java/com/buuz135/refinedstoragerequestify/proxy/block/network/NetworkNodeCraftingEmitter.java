@@ -28,17 +28,17 @@ import com.buuz135.refinedstoragerequestify.proxy.block.BlockCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileCraftingEmitter;
 import com.refinedmods.refinedstorage.api.autocrafting.task.ICraftingTask;
 import com.refinedmods.refinedstorage.apiimpl.network.node.NetworkNode;
+import com.refinedmods.refinedstorage.blockentity.config.IType;
 import com.refinedmods.refinedstorage.inventory.fluid.FluidInventory;
 import com.refinedmods.refinedstorage.inventory.item.BaseItemHandler;
 import com.refinedmods.refinedstorage.inventory.listener.NetworkNodeFluidInventoryListener;
 import com.refinedmods.refinedstorage.inventory.listener.NetworkNodeInventoryListener;
-import com.refinedmods.refinedstorage.tile.config.IType;
 import com.refinedmods.refinedstorage.util.StackUtils;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 public class NetworkNodeCraftingEmitter extends NetworkNode implements IType {
@@ -55,8 +55,8 @@ public class NetworkNodeCraftingEmitter extends NetworkNode implements IType {
 
     private ICraftingTask craftingTask = null;
 
-    public NetworkNodeCraftingEmitter(World world, BlockPos pos) {
-        super(world, pos);
+    public NetworkNodeCraftingEmitter(Level level, BlockPos pos) {
+        super(level, pos);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class NetworkNodeCraftingEmitter extends NetworkNode implements IType {
             if (type == IType.ITEMS) {
                 for (ICraftingTask task : network.getCraftingManager().getTasks()) {
                     for (int i = 0; i < itemFilter.getSlots(); i++) {
-                        if (task.getRequested().getItem() != null && task.getRequested().getItem().isItemEqual(itemFilter.getStackInSlot(i))) {
+                        if (task.getRequested().getItem() != null && task.getRequested().getItem().sameItem(itemFilter.getStackInSlot(i))) {
                             this.craftingTask = task;
                             updateState();
                             break;
@@ -109,7 +109,7 @@ public class NetworkNodeCraftingEmitter extends NetworkNode implements IType {
 
     @Override
     public int getType() {
-        return world.isRemote ? TileCraftingEmitter.TYPE.getValue() : type;
+        return level.isClientSide ? TileCraftingEmitter.TYPE.getValue() : type;
     }
 
     @Override
@@ -129,20 +129,20 @@ public class NetworkNodeCraftingEmitter extends NetworkNode implements IType {
     }
 
     @Override
-    public void read(CompoundNBT tag) {
+    public void read(CompoundTag tag) {
         super.read(tag);
         //StackUtils.readItems(itemFilter, 0, tag);
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT tag) {
+    public CompoundTag write(CompoundTag tag) {
         super.write(tag);
         //StackUtils.writeItems(itemFilter, 0, tag);
         return tag;
     }
 
     @Override
-    public CompoundNBT writeConfiguration(CompoundNBT tag) {
+    public CompoundTag writeConfiguration(CompoundTag tag) {
         super.writeConfiguration(tag);
         tag.putInt(NBT_TYPE, type);
         StackUtils.writeItems(itemFilter, 0, tag);
@@ -151,7 +151,7 @@ public class NetworkNodeCraftingEmitter extends NetworkNode implements IType {
     }
 
     @Override
-    public void readConfiguration(CompoundNBT tag) {
+    public void readConfiguration(CompoundTag tag) {
         super.readConfiguration(tag);
         if (tag.contains(NBT_TYPE)) {
             type = tag.getInt(NBT_TYPE);
@@ -163,15 +163,13 @@ public class NetworkNodeCraftingEmitter extends NetworkNode implements IType {
     }
 
     private void updateState() {
-        this.world.setBlockState(this.pos, CommonProxy.CRAFTING_EMITTER.getDefaultState().with(BlockCraftingEmitter.POWERED, this.craftingTask != null));
+        this.level.setBlockAndUpdate(this.pos, CommonProxy.CRAFTING_EMITTER.defaultBlockState().setValue(BlockCraftingEmitter.POWERED, this.craftingTask != null));
         for (Direction direction : Direction.values()) {
-            BlockPos blockpos = pos.offset(direction.getOpposite());
-            if (net.minecraftforge.event.ForgeEventFactory.onNeighborNotify(world, pos, world.getBlockState(pos), java.util.EnumSet.of(direction.getOpposite()), false).isCanceled())
+            BlockPos blockpos = pos.offset(direction.getOpposite().getNormal());
+            if (net.minecraftforge.event.ForgeEventFactory.onNeighborNotify(level, pos, level.getBlockState(pos), java.util.EnumSet.of(direction.getOpposite()), false).isCanceled())
                 return;
-            world.neighborChanged(blockpos, CommonProxy.CRAFTING_EMITTER, pos);
-            world.notifyNeighborsOfStateExcept(blockpos, CommonProxy.CRAFTING_EMITTER, direction);
+            level.neighborChanged(blockpos, CommonProxy.CRAFTING_EMITTER, pos);
+            level.updateNeighborsAtExceptFromFacing(blockpos, CommonProxy.CRAFTING_EMITTER, direction);
         }
     }
-
-
 }
