@@ -28,15 +28,15 @@ import com.buuz135.refinedstoragerequestify.proxy.client.GuiRequester;
 import com.buuz135.refinedstoragerequestify.proxy.config.RequestifyConfig;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerRequester;
-import net.minecraft.block.Block;
-import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -44,15 +44,13 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-@Mod(
-        RefinedStorageRequestify.MOD_ID
-)
+@Mod(RefinedStorageRequestify.MOD_ID)
 public class RefinedStorageRequestify {
 
     public static final String MOD_ID = "rsrequestify";
-    public static final ItemGroup TAB = new ItemGroup(MOD_ID) {
+    public static final CreativeModeTab TAB = new CreativeModeTab(MOD_ID) {
         @Override
-        public ItemStack createIcon() {
+        public ItemStack makeIcon() {
             return new ItemStack(CommonProxy.REQUESTER);
         }
     };
@@ -63,8 +61,8 @@ public class RefinedStorageRequestify {
         proxy = new CommonProxy();
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Block.class, proxy::registerBlocks);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, proxy::registerItems);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(TileEntityType.class, proxy::registerTiles);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(ContainerType.class, proxy::registerContainers);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(BlockEntityType.class, proxy::registerTiles);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(MenuType.class, proxy::registerContainers);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, RequestifyConfig.COMMON.SPEC);
         IEventBus mod = FMLJavaModLoadingContext.get().getModEventBus();
@@ -72,10 +70,8 @@ public class RefinedStorageRequestify {
     }
 
     public void onClientSetup(FMLClientSetupEvent event) {
-        ScreenManager.registerFactory(CommonProxy.REQUESTER_CONTAINER, (ScreenManager.IScreenFactory<ContainerRequester, GuiRequester>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiRequester(p_create_1_));
-        ScreenManager.registerFactory(CommonProxy.CRAFTING_EMITTER_CONTAINER, (ScreenManager.IScreenFactory<ContainerCraftingEmitter, GuiCraftingEmitter>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiCraftingEmitter(p_create_1_));
-        RenderTypeLookup.setRenderLayer(CommonProxy.CRAFTING_EMITTER, RenderType.getCutout());
+        MenuScreens.register(CommonProxy.REQUESTER_CONTAINER, (MenuScreens.ScreenConstructor<ContainerRequester, GuiRequester>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiRequester(p_create_1_));
+        MenuScreens.register(CommonProxy.CRAFTING_EMITTER_CONTAINER, (MenuScreens.ScreenConstructor<ContainerCraftingEmitter, GuiCraftingEmitter>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiCraftingEmitter(p_create_1_));
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.CRAFTING_EMITTER, RenderType.cutout());
     }
-
-
 }

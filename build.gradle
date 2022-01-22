@@ -1,70 +1,70 @@
 buildscript {
     repositories {
+        maven { url = 'https://maven.minecraftforge.net' }
         jcenter()
         mavenCentral()
-        maven { url = "https://maven.minecraftforge.net/" }
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    configurations {
-        classpath.resolutionStrategy {
-            cacheDynamicVersionsFor 10, 'seconds'
-            cacheChangingModulesFor 0, 'seconds'
-        }
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath 'com.selesse:gradle-git-changelog:0.2.+'
-        classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
     }
 }
-plugins {
-    id 'org.cadixdev.licenser' version '0.6.1'
-    id "com.matthewprenger.cursegradle" version "1.1.0"
-}
-apply plugin: 'net.minecraftforge.gradle'
-//apply plugin: 'com.selesse.git.changelog'
-apply plugin: 'java'
 
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+
+repositories {
+    maven {
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        name = "ModMaven"
+        url = "https://modmaven.k-4u.nl"
+    }
+    maven {
+        url = uri("https://maven.pkg.github.com/refinedmods/refinedstorage")
+        /* As of december 2021, GitHub packages requires authentication.
+           The password below is a personal access token that has read access to the Refined Mods repos.
+           It can be reused in other projects.
+           See: https://github.community/t/download-from-github-package-registry-without-authentication/14407/38 and
+                https://github.community/t/download-from-github-package-registry-without-authentication/14407/44
+         */
+        credentials {
+            username = "anything"
+            password = "\u0067hp_pnP5hVDYXXhhXwe21IEkrUzGjquUJL0xjLzb"
+        }
+    }
+    maven {
+        url "https://www.cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+}
 
 version = mod_version
 group = modGroup
 archivesBaseName = modBaseName
 
-String b = ""
-if (project.hasProperty("teamcity")) {
-    b = System.getenv("BUILD_NUMBER")
-}
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-if (b == null || b == "") {
-    version = "${project.minecraft_version}-${project.mod_version}"
-} else {
-    version = "${project.minecraft_version}-${project.mod_version}-" + b
-}
-
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-    // The mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   Snapshot are built nightly.
-    // stable_#            Stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20200916-1.16.2'
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-
+    mappings channel: "official", version: minecraft_version
+    
     //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
-    // Default run configurations.
-    // These can be tweaked, removed, or duplicated as needed.
     runs {
         client {
             workingDirectory project.file('run')
 
-            // Recommended logging data for a userdev environment
-            //property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
+            property 'forge.logging.markers', 'REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
+
+            // property 'mixin.env.disableRefMap', 'true'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
             mods {
                 seals {
@@ -76,11 +76,12 @@ minecraft {
         server {
             workingDirectory project.file('run')
 
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
+            property 'forge.logging.markers', 'REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
+
+            // property 'mixin.env.disableRefMap', 'true'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
             mods {
                 seals {
@@ -92,13 +93,15 @@ minecraft {
         data {
             workingDirectory project.file('run')
 
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.markers', 'REGISTRIES,REGISTRYDUMP'
 
-            // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
-            args '--mod', 'seals', '--all', '--output', file('src/generated/resources/')
+            // property 'mixin.env.disableRefMap', 'true'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+
+            args '--mod', 'seals', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
                 seals {
@@ -109,80 +112,16 @@ minecraft {
     }
 }
 
-repositories {
-    mavenCentral()
-    maven {
-        url "https://repo.refinedmods.com"
-    }
-    maven {
-        // location of the maven that hosts JEI files
-        name = "Progwml6 maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
-    }
-}
+sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.0'
-    compileOnly fg.deobf("com.refinedmods:refinedstorage:1.9.15+")
-    runtimeOnly fg.deobf("com.refinedmods:refinedstorage:1.9.15+")
-    compileOnly fg.deobf("mezz.jei:jei-1.16.3:7.5.0.42:api")
-    // at runtime, use the full JEI jar
-    runtimeOnly fg.deobf("mezz.jei:jei-1.16.3:7.5.0.42")
+    minecraft 'net.minecraftforge:forge:1.18.1-39.0.55'
+    implementation fg.deobf("com.refinedmods:refinedstorage:1.10.0-beta.4") {
+        transitive false
+    }
+    compileOnly fg.deobf("mezz.jei:jei-1.18.1:9.2.3.78:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.18.1:9.2.3.78")
 }
-
-/*
-changelog {
-    title = "RS: Requestify"
-    fileName = "CHANGELOG.md"
-    outputDirectory = file("$projectDir")
-    since = '0.0.0'
-    commitFormat = '%s (%an)'
-    markdown {
-        commitFormat = '* %s (%an)'
-    }
-    includeLines = {
-        !it.contains("Merge")
-    }
-    processLines = {
-        String input = it as String
-        if (input.contains('[ci skip] ')) {
-            input = input.minus('[ci skip] ')
-        }
-        input
-    }
-}*/
-
-tasks.curseforge.enabled = project.hasProperty('curse_api')
-
-curseforge {
-    if (project.hasProperty('curse_api')) {
-        apiKey = project.curse_api
-    }
-    project {
-        id = '307788'
-        changelog = file('CHANGELOG.md')
-        changelogType = 'markdown'
-        releaseType = 'beta'
-
-        mainArtifact(jar) {
-            relations {
-                requiredDependency 'refined-storage'
-            }
-        }
-
-    }
-}
-
-license {
-    header = project.file('HEADER')
-    ext {
-        year = Calendar.getInstance().get(Calendar.YEAR)
-        name = 'Buuz135'
-        mod = 'RSRequestifyu'
-    }
-}
-
-
 jar {
     manifest {
         attributes(["Specification-Title"     : project.name,
@@ -192,15 +131,19 @@ jar {
                     "Implementation-Version"  : "${project.mod_version}",
                     "Implementation-Vendor"   : "Buuz135",
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                    "ModSide"                 : "BOTH",
+                    "ModSide"                 : "BOTH"
         ],)
-
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    if (JavaVersion.current().isJava9Compatible()) {
-        it.options.release = 8
+jar.finalizedBy('reobfJar') 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        maven { url "file:///${project.projectDir}/mcmodsrepo" }
     }
 }
-

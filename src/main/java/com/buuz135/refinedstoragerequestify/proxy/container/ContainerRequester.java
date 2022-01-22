@@ -24,15 +24,15 @@ package com.buuz135.refinedstoragerequestify.proxy.container;
 
 import com.buuz135.refinedstoragerequestify.proxy.CommonProxy;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
-import com.refinedmods.refinedstorage.container.BaseContainer;
+import com.refinedmods.refinedstorage.blockentity.config.IType;
+import com.refinedmods.refinedstorage.container.BaseContainerMenu;
 import com.refinedmods.refinedstorage.container.slot.filter.FilterSlot;
 import com.refinedmods.refinedstorage.container.slot.filter.FluidFilterSlot;
-import com.refinedmods.refinedstorage.tile.config.IType;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
-public class ContainerRequester extends BaseContainer {
+public class ContainerRequester extends BaseContainerMenu {
 
-    public ContainerRequester(TileRequester tile, PlayerEntity player, int windowid) {
+    public ContainerRequester(TileRequester tile, Player player, int windowid) {
         super(CommonProxy.REQUESTER_CONTAINER, tile, player, windowid);
         for (int i = 0; i < 9; ++i) {
             addSlot(new FilterSlot(tile.getNode().getItemFilters(), i, 8 + (18 * i), 20).setEnableHandler(() -> tile.getNode().getType() == IType.ITEMS));
@@ -41,6 +41,6 @@ public class ContainerRequester extends BaseContainer {
             addSlot(new FluidFilterSlot(tile.getNode().getFluidFilters(), i, 8 + (18 * i), 20).setEnableHandler(() -> tile.getNode().getType() == IType.FLUIDS));
         }
         addPlayerInventory(8, 55);
-        transferManager.addFilterTransfer(player.inventory, tile.getNode().getItemFilters(), tile.getNode().getFluidFilters(), tile.getNode()::getType);
+        transferManager.addFilterTransfer(player.getInventory(), tile.getNode().getItemFilters(), tile.getNode().getFluidFilters(), tile.getNode()::getType);
     }
 }

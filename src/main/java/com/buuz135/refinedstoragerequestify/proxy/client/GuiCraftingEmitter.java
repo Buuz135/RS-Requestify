@@ -25,17 +25,17 @@ package com.buuz135.refinedstoragerequestify.proxy.client;
 import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerCraftingEmitter;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.refinedmods.refinedstorage.screen.BaseScreen;
 import com.refinedmods.refinedstorage.screen.widget.sidebutton.TypeSideButton;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 
 public class GuiCraftingEmitter extends BaseScreen<ContainerCraftingEmitter> {
 
 
     public GuiCraftingEmitter(ContainerCraftingEmitter container) {
-        super(container, 211, 137, container.getPlayer().inventory, new TranslationTextComponent("block.rsrequestify.crafting_emitter"));
+        super(container, 211, 137, container.getPlayer().getInventory(), new TranslatableComponent("block.rsrequestify.crafting_emitter"));
     }
 
     @Override
@@ -50,14 +50,15 @@ public class GuiCraftingEmitter extends BaseScreen<ContainerCraftingEmitter> {
     }
 
     @Override
-    public void renderBackground(MatrixStack matrixStack, int x, int y, int mouseX, int mouseY) {
-        this.minecraft.getTextureManager().bindTexture(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "textures/gui/crafting_emitter.png"));
-        blit(matrixStack, x, y, 0, 0, this.xSize, this.ySize);
+    public void renderBackground(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {
+        bindTexture(RefinedStorageRequestify.MOD_ID, "gui/crafting_emitter.png");
+
+        blit(poseStack, x, y, 0, 0, this.imageWidth, this.imageHeight);
     }
 
     @Override
-    public void renderForeground(MatrixStack matrixStack, int mouseX, int mouseY) {
-        renderString(matrixStack, 7, 7, new TranslationTextComponent("block.rsrequestify.crafting_emitter").getString());
-        renderString(matrixStack, 7, 43, new TranslationTextComponent("container.inventory").getString());
+    public void renderForeground(PoseStack poseStack, int mouseX, int mouseY) {
+        renderString(poseStack, 7, 7, new TranslatableComponent("block.rsrequestify.crafting_emitter").getString());
+        renderString(poseStack, 7, 43, new TranslatableComponent("container.inventory").getString());
     }
 }

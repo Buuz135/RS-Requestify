@@ -28,17 +28,17 @@ import com.buuz135.refinedstoragerequestify.proxy.config.RequestifyConfig;
 import com.refinedmods.refinedstorage.api.autocrafting.task.ICraftingTask;
 import com.refinedmods.refinedstorage.api.util.Action;
 import com.refinedmods.refinedstorage.apiimpl.network.node.NetworkNode;
+import com.refinedmods.refinedstorage.blockentity.config.IType;
 import com.refinedmods.refinedstorage.inventory.fluid.FluidInventory;
 import com.refinedmods.refinedstorage.inventory.item.BaseItemHandler;
 import com.refinedmods.refinedstorage.inventory.listener.NetworkNodeFluidInventoryListener;
 import com.refinedmods.refinedstorage.inventory.listener.NetworkNodeInventoryListener;
-import com.refinedmods.refinedstorage.tile.config.IType;
 import com.refinedmods.refinedstorage.util.StackUtils;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -61,8 +61,8 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
     private int attemptAmount = RequestifyConfig.COMMON.MAX_CRAFT_AMOUNT.get();
     private ICraftingTask craftingTask = null;
 
-    public NetworkNodeRequester(World world, BlockPos pos) {
-        super(world, pos);
+    public NetworkNodeRequester(Level level, BlockPos pos) {
+        super(level, pos);
     }
 
     @Override
@@ -155,7 +155,7 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
 
     @Override
     public int getType() {
-        return world.isRemote ? TileRequester.TYPE.getValue() : type;
+        return level.isClientSide ? TileRequester.TYPE.getValue() : type;
     }
 
     @Override
@@ -188,7 +188,7 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
     }
 
     @Override
-    public void read(CompoundNBT tag) {
+    public void read(CompoundTag tag) {
         super.read(tag);
         StackUtils.readItems(itemFilter, 0, tag);
         if (tag.contains(NBT_AMOUNT)) {
@@ -200,7 +200,7 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT tag) {
+    public CompoundTag write(CompoundTag tag) {
         super.write(tag);
         StackUtils.writeItems(itemFilter, 0, tag);
         tag.putInt(NBT_AMOUNT, amount);
@@ -209,7 +209,7 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
     }
 
     @Override
-    public CompoundNBT writeConfiguration(CompoundNBT tag) {
+    public CompoundTag writeConfiguration(CompoundTag tag) {
         super.writeConfiguration(tag);
         tag.putInt(NBT_TYPE, type);
         StackUtils.writeItems(itemFilter, 0, tag);
@@ -220,7 +220,7 @@ public class NetworkNodeRequester extends NetworkNode implements IType {
     }
 
     @Override
-    public void readConfiguration(CompoundNBT tag) {
+    public void readConfiguration(CompoundTag tag) {
         super.readConfiguration(tag);
         if (tag.contains(NBT_TYPE)) {
             type = tag.getInt(NBT_TYPE);

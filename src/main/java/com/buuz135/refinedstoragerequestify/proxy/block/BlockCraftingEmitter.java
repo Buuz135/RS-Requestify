@@ -31,32 +31,32 @@ import com.refinedmods.refinedstorage.api.network.security.Permission;
 import com.refinedmods.refinedstorage.apiimpl.API;
 import com.refinedmods.refinedstorage.apiimpl.network.node.NetworkNode;
 import com.refinedmods.refinedstorage.block.NetworkNodeBlock;
-import com.refinedmods.refinedstorage.container.factory.PositionalTileContainerProvider;
+import com.refinedmods.refinedstorage.container.factory.BlockEntityMenuProvider;
 import com.refinedmods.refinedstorage.util.BlockUtils;
 import com.refinedmods.refinedstorage.util.NetworkUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -65,55 +65,54 @@ public class BlockCraftingEmitter extends NetworkNodeBlock {
 
     public static final BooleanProperty POWERED = BooleanProperty.create("powered");
 
-    private static final VoxelShape SHAPE = makeCuboidShape(0, 0, 0, 16, 5, 16);
+    private static final VoxelShape SHAPE = box(0, 0, 0, 16, 5, 16);
 
     public BlockCraftingEmitter() {
         super(BlockUtils.DEFAULT_ROCK_PROPERTIES);
         setRegistryName(RefinedStorageRequestify.MOD_ID, "crafting_emitter");
-        API.instance().getNetworkNodeRegistry().add(NetworkNodeCraftingEmitter.ID, (compoundNBT, world, blockPos) -> readAndReturn(compoundNBT, new NetworkNodeCraftingEmitter(world, blockPos)));
-        this.setDefaultState(this.getStateContainer().getBaseState().with(POWERED, false));
+        API.instance().getNetworkNodeRegistry().add(NetworkNodeCraftingEmitter.ID, (compoundNBT, level, blockPos) -> readAndReturn(compoundNBT, new NetworkNodeCraftingEmitter(level, blockPos)));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(POWERED, false));
         //setCreativeTab(RefinedStorageRequestify.TAB);
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        super.fillStateContainer(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
 
         builder.add(POWERED);
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public boolean canProvidePower(BlockState state) {
+    public boolean isSignalSource(BlockState state) {
         return true;
     }
 
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new TileCraftingEmitter();
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new TileCraftingEmitter(pos, state);
     }
-
     @Override
     @SuppressWarnings("deprecation")
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (!world.isRemote) {
-            return NetworkUtils.attempt(world, pos, player, () -> NetworkHooks.openGui(
-                    (ServerPlayerEntity) player,
-                    new PositionalTileContainerProvider<TileCraftingEmitter>(
-                            new TranslationTextComponent("block.refinedstoragerequestify:crafting_emitter.name"),
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+        if (!level.isClientSide) {
+            return NetworkUtils.attempt(level, pos, player, () -> NetworkHooks.openGui(
+                    (ServerPlayer) player,
+                    new BlockEntityMenuProvider<TileCraftingEmitter>(
+                            new TranslatableComponent("block.refinedstoragerequestify:crafting_emitter.name"),
                             (tile, windowId, inventory, p) -> new ContainerCraftingEmitter(tile, player, windowId),
                             pos
                     ),
                     pos
             ), Permission.MODIFY, Permission.INSERT, Permission.EXTRACT);
         }
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
 
@@ -122,19 +121,18 @@ public class BlockCraftingEmitter extends NetworkNodeBlock {
         return false;
     }
 
-    private INetworkNode readAndReturn(CompoundNBT tag, NetworkNode node) {
+    private INetworkNode readAndReturn(CompoundTag tag, NetworkNode node) {
         node.read(tag);
         return node;
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {
+    public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, @Nullable Direction side) {
         return true;
     }
-
     @Override
-    public int getStrongPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-        TileEntity entity = blockAccess.getTileEntity(pos);
+    public int getDirectSignal(BlockState blockState, BlockGetter blockAccess, BlockPos pos, Direction side) {
+        BlockEntity entity = blockAccess.getBlockEntity(pos);
         if (entity instanceof TileCraftingEmitter) {
             if (((TileCraftingEmitter) entity).getNode().getCraftingTask() != null) return 15;
         }
@@ -142,8 +140,8 @@ public class BlockCraftingEmitter extends NetworkNodeBlock {
     }
 
     @Override
-    public int getWeakPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-        TileEntity entity = blockAccess.getTileEntity(pos);
+    public int getSignal(BlockState blockState, BlockGetter blockAccess, BlockPos pos, Direction side) {
+        BlockEntity entity = blockAccess.getBlockEntity(pos);
         if (entity instanceof TileCraftingEmitter) {
             if (((TileCraftingEmitter) entity).getNode().getCraftingTask() != null) return 15;
         }
@@ -151,8 +149,8 @@ public class BlockCraftingEmitter extends NetworkNodeBlock {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
-        tooltip.add(new TranslationTextComponent("block.rsrequestify.crafting_emitter.tooltip").mergeStyle(TextFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, @Nullable BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
+        tooltip.add(new TranslatableComponent("block.rsrequestify.crafting_emitter.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }

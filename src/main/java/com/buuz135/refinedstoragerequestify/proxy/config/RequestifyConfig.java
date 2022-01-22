@@ -24,6 +24,7 @@ package com.buuz135.refinedstoragerequestify.proxy.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 public class RequestifyConfig {
 
@@ -35,7 +36,7 @@ public class RequestifyConfig {
     private static abstract class ConfigClass {
         public ForgeConfigSpec SPEC;
 
-        public abstract void onConfigReload(ModConfig.Reloading event);
+        public abstract void onConfigReload(ModConfigEvent.Reloading event);
     }
 
     public static class Common extends ConfigClass {
@@ -51,11 +52,10 @@ public class RequestifyConfig {
         }
 
         @Override
-        public void onConfigReload(ModConfig.Reloading event) {
+        public void onConfigReload(ModConfigEvent.Reloading event) {
             if (event.getConfig().getType() == ModConfig.Type.COMMON) {
                 SPEC.setConfig(event.getConfig().getConfigData());
             }
         }
     }
-
 }
