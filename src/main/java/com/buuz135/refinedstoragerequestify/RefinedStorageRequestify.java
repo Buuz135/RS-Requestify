@@ -22,7 +22,7 @@
 
 package com.buuz135.refinedstoragerequestify;
 
-import com.buuz135.refinedstoragerequestify.proxy.CommonProxy;
+import com.buuz135.refinedstoragerequestify.proxy.Registry;
 import com.buuz135.refinedstoragerequestify.proxy.client.GuiCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.client.GuiRequester;
 import com.buuz135.refinedstoragerequestify.proxy.config.RequestifyConfig;
@@ -51,18 +51,18 @@ public class RefinedStorageRequestify {
     public static final CreativeModeTab TAB = new CreativeModeTab(MOD_ID) {
         @Override
         public ItemStack makeIcon() {
-            return new ItemStack(CommonProxy.REQUESTER);
+            return new ItemStack(Registry.REQUESTER_ITEM.get());
         }
     };
 
-    public static CommonProxy proxy;
+    public static Registry proxy;
 
     public RefinedStorageRequestify() {
-        proxy = new CommonProxy();
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Block.class, proxy::registerBlocks);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, proxy::registerItems);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(BlockEntityType.class, proxy::registerTiles);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(MenuType.class, proxy::registerContainers);
+        proxy = new Registry();
+        Registry.BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        Registry.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        Registry.BLOCK_ENTITY_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
+        Registry.MENU_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, RequestifyConfig.COMMON.SPEC);
         IEventBus mod = FMLJavaModLoadingContext.get().getModEventBus();
@@ -70,8 +70,7 @@ public class RefinedStorageRequestify {
     }
 
     public void onClientSetup(FMLClientSetupEvent event) {
-        MenuScreens.register(CommonProxy.REQUESTER_CONTAINER, (MenuScreens.ScreenConstructor<ContainerRequester, GuiRequester>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiRequester(p_create_1_));
-        MenuScreens.register(CommonProxy.CRAFTING_EMITTER_CONTAINER, (MenuScreens.ScreenConstructor<ContainerCraftingEmitter, GuiCraftingEmitter>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiCraftingEmitter(p_create_1_));
-        ItemBlockRenderTypes.setRenderLayer(CommonProxy.CRAFTING_EMITTER, RenderType.cutout());
+        MenuScreens.register(Registry.REQUESTER_CONTAINER.get(), (MenuScreens.ScreenConstructor<ContainerRequester, GuiRequester>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiRequester(p_create_1_));
+        MenuScreens.register(Registry.CRAFTING_EMITTER_CONTAINER.get(), (MenuScreens.ScreenConstructor<ContainerCraftingEmitter, GuiCraftingEmitter>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiCraftingEmitter(p_create_1_));
     }
 }

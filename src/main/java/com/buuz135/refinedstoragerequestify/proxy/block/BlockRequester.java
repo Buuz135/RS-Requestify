@@ -22,7 +22,6 @@
 
 package com.buuz135.refinedstoragerequestify.proxy.block;
 
-import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.block.network.NetworkNodeRequester;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerRequester;
@@ -38,7 +37,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -59,7 +57,6 @@ public class BlockRequester extends NetworkNodeBlock {
 
     public BlockRequester() {
         super(BlockUtils.DEFAULT_ROCK_PROPERTIES);
-        setRegistryName(RefinedStorageRequestify.MOD_ID, "requester");
         API.instance().getNetworkNodeRegistry().add(NetworkNodeRequester.ID, (compoundNBT, world, blockPos) -> readAndReturn(compoundNBT, new NetworkNodeRequester(world, blockPos)));
         //setCreativeTab(RefinedStorageRequestify.TAB);
     }
@@ -72,10 +69,10 @@ public class BlockRequester extends NetworkNodeBlock {
     @SuppressWarnings("deprecation")
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
         if (!level.isClientSide) {
-            return NetworkUtils.attempt(level, pos, player, () -> NetworkHooks.openGui(
+            return NetworkUtils.attempt(level, pos, player, () -> NetworkHooks.openScreen(
                     (ServerPlayer) player,
                     new BlockEntityMenuProvider<TileRequester>(
-                            new TranslatableComponent("block.refinedstoragerequestify:requester.name"),
+                            Component.translatable("block.refinedstoragerequestify:requester.name"),
                             (tile, windowId, inventory, p) -> new ContainerRequester(tile, player, windowId),
                             pos
                     ),
@@ -99,6 +96,6 @@ public class BlockRequester extends NetworkNodeBlock {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, tooltip, flagIn);
-        tooltip.add(new TranslatableComponent("block.rsrequestify.requester.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("block.rsrequestify.requester.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }

@@ -23,7 +23,7 @@
 package com.buuz135.refinedstoragerequestify.proxy.block.network;
 
 import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
-import com.buuz135.refinedstoragerequestify.proxy.CommonProxy;
+import com.buuz135.refinedstoragerequestify.proxy.Registry;
 import com.buuz135.refinedstoragerequestify.proxy.block.BlockCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileCraftingEmitter;
 import com.refinedmods.refinedstorage.api.autocrafting.task.ICraftingTask;
@@ -163,13 +163,13 @@ public class NetworkNodeCraftingEmitter extends NetworkNode implements IType {
     }
 
     private void updateState() {
-        this.level.setBlockAndUpdate(this.pos, CommonProxy.CRAFTING_EMITTER.defaultBlockState().setValue(BlockCraftingEmitter.POWERED, this.craftingTask != null));
+        this.level.setBlockAndUpdate(this.pos, Registry.CRAFTING_EMITTER.get().defaultBlockState().setValue(BlockCraftingEmitter.POWERED, this.craftingTask != null));
         for (Direction direction : Direction.values()) {
             BlockPos blockpos = pos.offset(direction.getOpposite().getNormal());
             if (net.minecraftforge.event.ForgeEventFactory.onNeighborNotify(level, pos, level.getBlockState(pos), java.util.EnumSet.of(direction.getOpposite()), false).isCanceled())
                 return;
-            level.neighborChanged(blockpos, CommonProxy.CRAFTING_EMITTER, pos);
-            level.updateNeighborsAtExceptFromFacing(blockpos, CommonProxy.CRAFTING_EMITTER, direction);
+            level.neighborChanged(blockpos, Registry.CRAFTING_EMITTER.get(), pos);
+            level.updateNeighborsAtExceptFromFacing(blockpos, Registry.CRAFTING_EMITTER.get(), direction);
         }
     }
 }

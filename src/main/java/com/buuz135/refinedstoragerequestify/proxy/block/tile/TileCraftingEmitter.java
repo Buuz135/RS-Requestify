@@ -22,12 +22,13 @@
 
 package com.buuz135.refinedstoragerequestify.proxy.block.tile;
 
-import com.buuz135.refinedstoragerequestify.proxy.CommonProxy;
+import com.buuz135.refinedstoragerequestify.proxy.Registry;
 import com.buuz135.refinedstoragerequestify.proxy.block.network.NetworkNodeCraftingEmitter;
 import com.refinedmods.refinedstorage.blockentity.NetworkNodeBlockEntity;
 import com.refinedmods.refinedstorage.blockentity.config.IType;
 import com.refinedmods.refinedstorage.blockentity.data.BlockEntitySynchronizationManager;
 import com.refinedmods.refinedstorage.blockentity.data.BlockEntitySynchronizationParameter;
+import com.refinedmods.refinedstorage.blockentity.data.BlockEntitySynchronizationSpec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -40,10 +41,12 @@ public class TileCraftingEmitter extends NetworkNodeBlockEntity<NetworkNodeCraft
         BlockEntitySynchronizationManager.registerParameter(TYPE);
     }
 
-    public TileCraftingEmitter(BlockPos pos, BlockState state) {
-        super(CommonProxy.CRAFTING_EMITTER_TYPE, pos, state);
+    public static BlockEntitySynchronizationSpec SPEC = BlockEntitySynchronizationSpec.builder()
+            .addWatchedParameter(TYPE)
+            .build();
 
-        dataManager.addWatchedParameter(TYPE);
+    public TileCraftingEmitter(BlockPos pos, BlockState state) {
+        super(Registry.CRAFTING_EMITTER_TYPE.get(), pos, state, SPEC);
     }
 
     @Override
