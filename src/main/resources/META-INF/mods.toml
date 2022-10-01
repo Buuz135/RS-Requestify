@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[28,)"
+loaderVersion = "[43,)"
 license = "MIT"
 [[mods]]
 modId = "rsrequestify"
@@ -11,13 +11,13 @@ description = "Display your achievements with style"
 [[dependencies.rsrequestify]]
     modId="refinedstorage"
     mandatory=true
-    versionRange="[1.10.0-beta.4,)"
+    versionRange="[1.11.0,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.rsrequestify]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18,)"
+    versionRange="[1.19.2,)"
     ordering="NONE"
     side="BOTH"

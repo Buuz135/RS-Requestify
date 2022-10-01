@@ -22,13 +22,14 @@
 
 package com.buuz135.refinedstoragerequestify.proxy.block.tile;
 
-import com.buuz135.refinedstoragerequestify.proxy.CommonProxy;
+import com.buuz135.refinedstoragerequestify.proxy.Registry;
 import com.buuz135.refinedstoragerequestify.proxy.block.network.NetworkNodeRequester;
 import com.buuz135.refinedstoragerequestify.proxy.client.GuiRequester;
 import com.refinedmods.refinedstorage.blockentity.NetworkNodeBlockEntity;
 import com.refinedmods.refinedstorage.blockentity.config.IType;
 import com.refinedmods.refinedstorage.blockentity.data.BlockEntitySynchronizationManager;
 import com.refinedmods.refinedstorage.blockentity.data.BlockEntitySynchronizationParameter;
+import com.refinedmods.refinedstorage.blockentity.data.BlockEntitySynchronizationSpec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -53,11 +54,14 @@ public class TileRequester extends NetworkNodeBlockEntity<NetworkNodeRequester> 
         BlockEntitySynchronizationManager.registerParameter(MISSING);
     }
 
+    public static BlockEntitySynchronizationSpec SPEC = BlockEntitySynchronizationSpec.builder()
+            .addWatchedParameter(TYPE)
+            .addWatchedParameter(AMOUNT)
+            .addWatchedParameter(MISSING)
+            .build();
+
     public TileRequester(BlockPos pos, BlockState state) {
-        super(CommonProxy.REQUESTER_TYPE, pos, state);
-        dataManager.addWatchedParameter(TYPE);
-        dataManager.addWatchedParameter(AMOUNT);
-        dataManager.addParameter(MISSING);
+        super(Registry.REQUESTER_TYPE.get(), pos, state, SPEC);
     }
 
     @Override

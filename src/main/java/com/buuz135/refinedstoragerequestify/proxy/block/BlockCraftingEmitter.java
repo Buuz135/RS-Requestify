@@ -39,7 +39,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -69,7 +68,6 @@ public class BlockCraftingEmitter extends NetworkNodeBlock {
 
     public BlockCraftingEmitter() {
         super(BlockUtils.DEFAULT_ROCK_PROPERTIES);
-        setRegistryName(RefinedStorageRequestify.MOD_ID, "crafting_emitter");
         API.instance().getNetworkNodeRegistry().add(NetworkNodeCraftingEmitter.ID, (compoundNBT, level, blockPos) -> readAndReturn(compoundNBT, new NetworkNodeCraftingEmitter(level, blockPos)));
         this.registerDefaultState(this.getStateDefinition().any().setValue(POWERED, false));
         //setCreativeTab(RefinedStorageRequestify.TAB);
@@ -102,10 +100,10 @@ public class BlockCraftingEmitter extends NetworkNodeBlock {
     @SuppressWarnings("deprecation")
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
         if (!level.isClientSide) {
-            return NetworkUtils.attempt(level, pos, player, () -> NetworkHooks.openGui(
+            return NetworkUtils.attempt(level, pos, player, () -> NetworkHooks.openScreen(
                     (ServerPlayer) player,
                     new BlockEntityMenuProvider<TileCraftingEmitter>(
-                            new TranslatableComponent("block.refinedstoragerequestify:crafting_emitter.name"),
+                            Component.translatable("block.refinedstoragerequestify:crafting_emitter.name"),
                             (tile, windowId, inventory, p) -> new ContainerCraftingEmitter(tile, player, windowId),
                             pos
                     ),
@@ -151,6 +149,6 @@ public class BlockCraftingEmitter extends NetworkNodeBlock {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, tooltip, flagIn);
-        tooltip.add(new TranslatableComponent("block.rsrequestify.crafting_emitter.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("block.rsrequestify.crafting_emitter.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }

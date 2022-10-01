@@ -28,14 +28,13 @@ import com.buuz135.refinedstoragerequestify.proxy.container.ContainerCraftingEmi
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.refinedmods.refinedstorage.screen.BaseScreen;
 import com.refinedmods.refinedstorage.screen.widget.sidebutton.TypeSideButton;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 
 public class GuiCraftingEmitter extends BaseScreen<ContainerCraftingEmitter> {
 
 
     public GuiCraftingEmitter(ContainerCraftingEmitter container) {
-        super(container, 211, 137, container.getPlayer().getInventory(), new TranslatableComponent("block.rsrequestify.crafting_emitter"));
+        super(container, 211, 137, container.getPlayer().getInventory(), Component.translatable("block.rsrequestify.crafting_emitter"));
     }
 
     @Override
@@ -58,7 +57,7 @@ public class GuiCraftingEmitter extends BaseScreen<ContainerCraftingEmitter> {
 
     @Override
     public void renderForeground(PoseStack poseStack, int mouseX, int mouseY) {
-        renderString(poseStack, 7, 7, new TranslatableComponent("block.rsrequestify.crafting_emitter").getString());
-        renderString(poseStack, 7, 43, new TranslatableComponent("container.inventory").getString());
+        renderString(poseStack, 7, 7, Component.translatable("block.rsrequestify.crafting_emitter").getString());
+        renderString(poseStack, 7, 43, Component.translatable("container.inventory").getString());
     }
 }

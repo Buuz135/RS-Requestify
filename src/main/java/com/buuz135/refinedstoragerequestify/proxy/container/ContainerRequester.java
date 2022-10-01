@@ -22,7 +22,7 @@
 
 package com.buuz135.refinedstoragerequestify.proxy.container;
 
-import com.buuz135.refinedstoragerequestify.proxy.CommonProxy;
+import com.buuz135.refinedstoragerequestify.proxy.Registry;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
 import com.refinedmods.refinedstorage.blockentity.config.IType;
 import com.refinedmods.refinedstorage.container.BaseContainerMenu;
@@ -33,7 +33,7 @@ import net.minecraft.world.entity.player.Player;
 public class ContainerRequester extends BaseContainerMenu {
 
     public ContainerRequester(TileRequester tile, Player player, int windowid) {
-        super(CommonProxy.REQUESTER_CONTAINER, tile, player, windowid);
+        super(Registry.REQUESTER_CONTAINER.get(), tile, player, windowid);
         for (int i = 0; i < 9; ++i) {
             addSlot(new FilterSlot(tile.getNode().getItemFilters(), i, 8 + (18 * i), 20).setEnableHandler(() -> tile.getNode().getType() == IType.ITEMS));
         }
