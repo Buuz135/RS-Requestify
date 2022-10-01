@@ -1,0 +1,9 @@
+{
+  "itemGroup.rsrequestify": "RS: Requestify",
+  "block.rsrequestify.requester": "Demandeur",
+  "button.refinedstoragerequestify:requester.save": "Sauvegarder",
+  "tooltip.refinedstoragerequestify:requester.missing": "Ingrédients manquants",
+  "block.rsrequestify.crafting_emitter": "Émetteur d'artisanat",
+  "block.rsrequestify.crafting_emitter.tooltip": "Émet un signal Redstone lorsqu'un objet/fluide dans le filtre est en cours de fabrication.",
+  "block.rsrequestify.requester.tooltip": "Maintient l'article/liquide filtré en stock avec la quantité souhaitée."
+}
