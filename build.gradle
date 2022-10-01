@@ -32,7 +32,7 @@ repositories {
          */
         credentials {
             username = "anything"
-            password = "\u0067hp_pnP5hVDYXXhhXwe21IEkrUzGjquUJL0xjLzb"
+            password = "\u0067hp_oGjcDFCn8jeTzIj4Ke9pLoEVtpnZMP4VQgaX"
         }
     }
     maven {
@@ -52,7 +52,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
     mappings channel: "official", version: minecraft_version
-    
+
     //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -137,13 +137,3 @@ jar {
 }
 
 jar.finalizedBy('reobfJar') 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact jar
-        }
-    }
-    repositories {
-        maven { url "file:///${project.projectDir}/mcmodsrepo" }
-    }
-}
