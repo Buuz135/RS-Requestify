@@ -30,9 +30,10 @@ import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerRequester;
 import com.refinedmods.refinedstorage.container.factory.BlockEntityContainerFactory;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
@@ -46,11 +47,13 @@ public class Registry {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, RefinedStorageRequestify.MOD_ID);
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, RefinedStorageRequestify.MOD_ID);
 
+    public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, RefinedStorageRequestify.MOD_ID);
+
     public static final RegistryObject<BlockRequester> REQUESTER = BLOCKS.register("requester", () -> new BlockRequester());
     public static final RegistryObject<BlockCraftingEmitter> CRAFTING_EMITTER = BLOCKS.register("crafting_emitter", () -> new BlockCraftingEmitter());
 
-    public static final RegistryObject<Item> REQUESTER_ITEM = ITEMS.register("requester", () -> new BlockItem(Registry.REQUESTER.get(), new Item.Properties().tab(RefinedStorageRequestify.TAB)));
-    public static final RegistryObject<Item> CRAFTING_EMITTER_ITEM = ITEMS.register("crafting_emitter", () -> new BlockItem(Registry.CRAFTING_EMITTER.get(), new Item.Properties().tab(RefinedStorageRequestify.TAB)));
+    public static final RegistryObject<Item> REQUESTER_ITEM = ITEMS.register("requester", () -> new BlockItem(Registry.REQUESTER.get(), new Item.Properties()));
+    public static final RegistryObject<Item> CRAFTING_EMITTER_ITEM = ITEMS.register("crafting_emitter", () -> new BlockItem(Registry.CRAFTING_EMITTER.get(), new Item.Properties()));
 
     public static final RegistryObject<BlockEntityType<TileRequester>> REQUESTER_TYPE = BLOCK_ENTITY_TYPES.register("requester", () -> BlockEntityType.Builder
             .of((pos, state) -> new TileRequester(pos, state), Registry.REQUESTER.get())
@@ -62,4 +65,14 @@ public class Registry {
 
     public static final RegistryObject<MenuType<ContainerRequester>> REQUESTER_CONTAINER = MENU_TYPES.register("requester", () -> IForgeMenuType.create(new BlockEntityContainerFactory<ContainerRequester, TileRequester>((windowId, inv, blockEntity) -> new ContainerRequester(blockEntity, inv.player, windowId))));
     public static final RegistryObject<MenuType<ContainerCraftingEmitter>> CRAFTING_EMITTER_CONTAINER = MENU_TYPES.register("crafting_emitter", () -> IForgeMenuType.create(new BlockEntityContainerFactory<ContainerCraftingEmitter, TileCraftingEmitter>((windowId, inv, blockEntity) -> new ContainerCraftingEmitter(blockEntity, inv.player, windowId))));
+
+    public static final RegistryObject<CreativeModeTab> TAB = CREATIVE_TABS.register("rsrequestify", () -> CreativeModeTab.builder()
+            .withTabsBefore(CreativeModeTabs.SPAWN_EGGS)
+            .icon(() -> new ItemStack(REQUESTER_ITEM.get()))
+            .title(Component.translatable("itemGroup.rsrequestify"))
+            .displayItems((p_270258_, a) -> {
+                a.accept(new ItemStack(REQUESTER_ITEM.get()));
+                a.accept(new ItemStack(CRAFTING_EMITTER_ITEM.get()));
+            })
+            .build());
 }

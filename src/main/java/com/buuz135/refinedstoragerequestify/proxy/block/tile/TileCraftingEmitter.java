@@ -22,6 +22,7 @@
 
 package com.buuz135.refinedstoragerequestify.proxy.block.tile;
 
+import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.Registry;
 import com.buuz135.refinedstoragerequestify.proxy.block.network.NetworkNodeCraftingEmitter;
 import com.refinedmods.refinedstorage.blockentity.NetworkNodeBlockEntity;
@@ -30,12 +31,13 @@ import com.refinedmods.refinedstorage.blockentity.data.BlockEntitySynchronizatio
 import com.refinedmods.refinedstorage.blockentity.data.BlockEntitySynchronizationParameter;
 import com.refinedmods.refinedstorage.blockentity.data.BlockEntitySynchronizationSpec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileCraftingEmitter extends NetworkNodeBlockEntity<NetworkNodeCraftingEmitter> {
 
-    public static final BlockEntitySynchronizationParameter<Integer, TileCraftingEmitter> TYPE = IType.createParameter();
+    public static final BlockEntitySynchronizationParameter<Integer, TileCraftingEmitter> TYPE = IType.createParameter(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "crafting_emitter_type"));
 
     static {
         BlockEntitySynchronizationManager.registerParameter(TYPE);

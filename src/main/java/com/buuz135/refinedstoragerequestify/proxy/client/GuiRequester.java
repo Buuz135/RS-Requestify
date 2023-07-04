@@ -25,8 +25,6 @@ package com.buuz135.refinedstoragerequestify.proxy.client;
 import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerRequester;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.refinedmods.refinedstorage.RS;
 import com.refinedmods.refinedstorage.blockentity.DetectorBlockEntity;
 import com.refinedmods.refinedstorage.blockentity.data.BlockEntitySynchronizationManager;
 import com.refinedmods.refinedstorage.render.RenderSettings;
@@ -34,8 +32,10 @@ import com.refinedmods.refinedstorage.screen.BaseScreen;
 import com.refinedmods.refinedstorage.screen.widget.sidebutton.RedstoneModeSideButton;
 import com.refinedmods.refinedstorage.screen.widget.sidebutton.TypeSideButton;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 
 public class GuiRequester extends BaseScreen<ContainerRequester> {
@@ -69,7 +69,7 @@ public class GuiRequester extends BaseScreen<ContainerRequester> {
         //textField.setEnableBackgroundDrawing(false);
         textField.setVisible(true);
         textField.setCanLoseFocus(true);
-        textField.setFocus(false);
+        textField.setFocused(false);
         textField.setTextColor(RenderSettings.INSTANCE.getSecondaryColor());
         textField.setResponder(value -> {
             try {
@@ -93,23 +93,22 @@ public class GuiRequester extends BaseScreen<ContainerRequester> {
     }
 
     @Override
-    public void renderBackground(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {
-        bindTexture(RefinedStorageRequestify.MOD_ID, "gui/requester.png");
+    public void renderBackground(GuiGraphics graphics, int x, int y, int mouseX, int mouseY) {
 
-        blit(poseStack, x, y, 0, 0, this.imageWidth, this.imageHeight);
+        graphics.blit(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "textures/gui/requester.png"), x, y, 0, 0, this.imageWidth, this.imageHeight);
+
         if (TileRequester.MISSING.getValue()) {
-            bindTexture(RS.ID, "gui/crafting_preview.png");
-            blit(poseStack, x + 153, y + 1, 0, 256 - 16, 16, 16);
+            graphics.blit(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "textures/gui/crafting_preview.png"), x + 153, y + 1, 0, 256 - 16, 16, 16);
         }
-        textField.render(poseStack, mouseX, mouseY, 0);
+        textField.render(graphics, mouseX, mouseY, 0);
     }
 
     @Override
-    public void renderForeground(PoseStack poseStack, int mouseX, int mouseY) {
-        renderString(poseStack, 7, 7, Component.translatable("block.rsrequestify.requester").getString());
-        renderString(poseStack, 7, 43, Component.translatable("container.inventory").getString());
+    public void renderForeground(GuiGraphics graphics, int mouseX, int mouseY) {
+        renderString(graphics, 7, 7, Component.translatable("block.rsrequestify.requester").getString());
+        renderString(graphics, 7, 43, Component.translatable("container.inventory").getString());
         if (TileRequester.MISSING.getValue() && isHovering(153, 1, 16, 16, mouseX + leftPos, mouseY + topPos)) {
-            renderTooltip(poseStack, Component.translatable("tooltip.refinedstoragerequestify:requester.missing"), mouseX, mouseY);
+            renderTooltip(graphics, mouseX, mouseY, Component.translatable("tooltip.refinedstoragerequestify:requester.missing").getString());
         }
     }
 }

@@ -38,6 +38,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -71,7 +72,7 @@ public class NetworkNodeCraftingEmitter extends NetworkNode implements IType {
             if (type == IType.ITEMS) {
                 for (ICraftingTask task : network.getCraftingManager().getTasks()) {
                     for (int i = 0; i < itemFilter.getSlots(); i++) {
-                        if (task.getRequested().getItem() != null && task.getRequested().getItem().sameItem(itemFilter.getStackInSlot(i))) {
+                        if (task.getRequested().getItem() != null && ItemStack.isSameItem(task.getRequested().getItem(), itemFilter.getStackInSlot(i))) {
                             this.craftingTask = task;
                             updateState();
                             break;

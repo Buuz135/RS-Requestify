@@ -22,6 +22,7 @@
 
 package com.buuz135.refinedstoragerequestify.proxy.block.tile;
 
+import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.Registry;
 import com.buuz135.refinedstoragerequestify.proxy.block.network.NetworkNodeRequester;
 import com.buuz135.refinedstoragerequestify.proxy.client.GuiRequester;
@@ -39,13 +40,13 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileRequester extends NetworkNodeBlockEntity<NetworkNodeRequester> {
 
-    public static final BlockEntitySynchronizationParameter<Integer, TileRequester> TYPE = IType.createParameter();
-    public static final BlockEntitySynchronizationParameter<Integer, TileRequester> AMOUNT = new BlockEntitySynchronizationParameter<>(EntityDataSerializers.INT, 0, t -> t.getNode().getAmount(), (t, v) -> t.getNode().setAmount(v), (initial, p) -> Minecraft.getInstance().tell(() -> {
+    public static final BlockEntitySynchronizationParameter<Integer, TileRequester> TYPE = IType.createParameter(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "tile_requester_type"));
+    public static final BlockEntitySynchronizationParameter<Integer, TileRequester> AMOUNT = new BlockEntitySynchronizationParameter<Integer, TileRequester>(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "tile_requester_amount"), EntityDataSerializers.INT, 0, t -> t.getNode().getAmount(), (t, v) -> t.getNode().setAmount(v), (initial, p) -> Minecraft.getInstance().tell(() -> {
         if (Minecraft.getInstance().screen instanceof GuiRequester) {
             ((GuiRequester) Minecraft.getInstance().screen).getTextField().setValue(String.valueOf(p));
         }
     }));
-    public static final BlockEntitySynchronizationParameter<Boolean, TileRequester> MISSING = new BlockEntitySynchronizationParameter<>(EntityDataSerializers.BOOLEAN, false, tileRequester -> tileRequester.getNode().isMissingItems(), (tileRequester, aBoolean) -> {
+    public static final BlockEntitySynchronizationParameter<Boolean, TileRequester> MISSING = new BlockEntitySynchronizationParameter<>(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "tile_requester_missing"), EntityDataSerializers.BOOLEAN, false, tileRequester -> tileRequester.getNode().isMissingItems(), (tileRequester, aBoolean) -> {
     });
 
     static {
@@ -72,4 +73,6 @@ public class TileRequester extends NetworkNodeBlockEntity<NetworkNodeRequester> 
     public ResourceLocation getNodeId() {
         return NetworkNodeRequester.ID;
     }
+
+
 }

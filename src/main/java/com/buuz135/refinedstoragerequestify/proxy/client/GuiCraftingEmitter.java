@@ -25,10 +25,11 @@ package com.buuz135.refinedstoragerequestify.proxy.client;
 import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerCraftingEmitter;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.refinedmods.refinedstorage.screen.BaseScreen;
 import com.refinedmods.refinedstorage.screen.widget.sidebutton.TypeSideButton;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 public class GuiCraftingEmitter extends BaseScreen<ContainerCraftingEmitter> {
 
@@ -49,15 +50,16 @@ public class GuiCraftingEmitter extends BaseScreen<ContainerCraftingEmitter> {
     }
 
     @Override
-    public void renderBackground(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {
-        bindTexture(RefinedStorageRequestify.MOD_ID, "gui/crafting_emitter.png");
-
-        blit(poseStack, x, y, 0, 0, this.imageWidth, this.imageHeight);
+    public void renderBackground(GuiGraphics graphics, int x, int y, int mouseX, int mouseY) {
+        //super.renderBg(graphics, renderPartialTicks, mouseX, mouseY);
+        graphics.blit(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "textures/gui/crafting_emitter.png"), x, y, 0, 0, this.imageWidth, this.imageHeight);
     }
+
 
     @Override
-    public void renderForeground(PoseStack poseStack, int mouseX, int mouseY) {
-        renderString(poseStack, 7, 7, Component.translatable("block.rsrequestify.crafting_emitter").getString());
-        renderString(poseStack, 7, 43, Component.translatable("container.inventory").getString());
+    public void renderForeground(GuiGraphics guiGraphics, int i, int i1) {
+        renderString(guiGraphics, 7, 7, Component.translatable("block.rsrequestify.crafting_emitter").getString());
+        renderString(guiGraphics, 7, 43, Component.translatable("container.inventory").getString());
     }
+
 }

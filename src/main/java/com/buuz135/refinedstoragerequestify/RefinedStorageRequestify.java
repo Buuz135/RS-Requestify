@@ -29,14 +29,6 @@ import com.buuz135.refinedstoragerequestify.proxy.config.RequestifyConfig;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerRequester;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -48,12 +40,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public class RefinedStorageRequestify {
 
     public static final String MOD_ID = "rsrequestify";
-    public static final CreativeModeTab TAB = new CreativeModeTab(MOD_ID) {
-        @Override
-        public ItemStack makeIcon() {
-            return new ItemStack(Registry.REQUESTER_ITEM.get());
-        }
-    };
 
     public static Registry proxy;
 
@@ -63,6 +49,7 @@ public class RefinedStorageRequestify {
         Registry.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
         Registry.BLOCK_ENTITY_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
         Registry.MENU_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
+        Registry.CREATIVE_TABS.register(FMLJavaModLoadingContext.get().getModEventBus());
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, RequestifyConfig.COMMON.SPEC);
         IEventBus mod = FMLJavaModLoadingContext.get().getModEventBus();
