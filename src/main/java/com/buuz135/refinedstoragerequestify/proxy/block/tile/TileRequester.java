@@ -59,6 +59,7 @@ public class TileRequester extends NetworkNodeBlockEntity<NetworkNodeRequester> 
             .addWatchedParameter(TYPE)
             .addWatchedParameter(AMOUNT)
             .addWatchedParameter(MISSING)
+            .addWatchedParameter(REDSTONE_MODE)
             .build();
 
     public TileRequester(BlockPos pos, BlockState state) {
