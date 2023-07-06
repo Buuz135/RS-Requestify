@@ -25,6 +25,7 @@ package com.buuz135.refinedstoragerequestify.proxy.client;
 import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileRequester;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerRequester;
+import com.refinedmods.refinedstorage.RS;
 import com.refinedmods.refinedstorage.blockentity.DetectorBlockEntity;
 import com.refinedmods.refinedstorage.blockentity.data.BlockEntitySynchronizationManager;
 import com.refinedmods.refinedstorage.render.RenderSettings;
@@ -98,7 +99,7 @@ public class GuiRequester extends BaseScreen<ContainerRequester> {
         graphics.blit(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "textures/gui/requester.png"), x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         if (TileRequester.MISSING.getValue()) {
-            graphics.blit(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "textures/gui/crafting_preview.png"), x + 153, y + 1, 0, 256 - 16, 16, 16);
+            graphics.blit(new ResourceLocation(RS.ID, "textures/gui/crafting_preview.png"), x + 153, y + 1, 0, 256 - 16, 16, 16);
         }
         textField.render(graphics, mouseX, mouseY, 0);
     }

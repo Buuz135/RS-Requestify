@@ -43,7 +43,7 @@ repositories {
     }
 }
 
-version = mod_version
+version = minecraft_version + "-" + mod_version
 group = modGroup
 archivesBaseName = modBaseName
 
