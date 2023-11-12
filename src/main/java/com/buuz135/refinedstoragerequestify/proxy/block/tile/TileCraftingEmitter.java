@@ -48,7 +48,7 @@ public class TileCraftingEmitter extends NetworkNodeBlockEntity<NetworkNodeCraft
             .build();
 
     public TileCraftingEmitter(BlockPos pos, BlockState state) {
-        super(Registry.CRAFTING_EMITTER_TYPE.get(), pos, state, SPEC);
+        super(Registry.CRAFTING_EMITTER_TYPE.get(), pos, state, SPEC, NetworkNodeCraftingEmitter.class);
     }
 
     @Override

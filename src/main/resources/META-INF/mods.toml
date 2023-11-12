@@ -11,7 +11,7 @@ description = "Display your achievements with style"
 [[dependencies.rsrequestify]]
     modId="refinedstorage"
     mandatory=true
-    versionRange="[1.11.0,)"
+versionRange = "[1.12.4,)"
     ordering="NONE"
     side="BOTH"
 

@@ -23,19 +23,6 @@ repositories {
         url = "https://modmaven.k-4u.nl"
     }
     maven {
-        url = uri("https://maven.pkg.github.com/refinedmods/refinedstorage")
-        /* As of december 2021, GitHub packages requires authentication.
-           The password below is a personal access token that has read access to the Refined Mods repos.
-           It can be reused in other projects.
-           See: https://github.community/t/download-from-github-package-registry-without-authentication/14407/38 and
-                https://github.community/t/download-from-github-package-registry-without-authentication/14407/44
-         */
-        credentials {
-            username = "anything"
-            password = "\u0067hp_oGjcDFCn8jeTzIj4Ke9pLoEVtpnZMP4VQgaX"
-        }
-    }
-    maven {
         url "https://www.cursemaven.com"
         content {
             includeGroup "curse.maven"
@@ -49,7 +36,6 @@ archivesBaseName = modBaseName
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
     mappings channel: "official", version: minecraft_version
 
@@ -120,7 +106,7 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-1.20.1-common-api:15.1.0.19")
     compileOnly fg.deobf("mezz.jei:jei-1.20.1-forge-api:15.1.0.19")
 
-    implementation fg.deobf("curse.maven:refined-storage-243076:4623636")
+    implementation fg.deobf("curse.maven:refined-storage-243076:4844585")
 }
 jar {
     manifest {
