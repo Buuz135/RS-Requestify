@@ -6,12 +6,12 @@ modId = "rsrequestify"
 version = "${file.jarVersion}"
 displayName = "RSRequestify"
 authors = "Buuz135"
-description = "Display your achievements with style"
+description = "Keep the RS system Full"
 
 [[dependencies.rsrequestify]]
     modId="refinedstorage"
     mandatory=true
-    versionRange="[1.11.0,)"
+versionRange = "[1.11.7,)"
     ordering="NONE"
     side="BOTH"
 

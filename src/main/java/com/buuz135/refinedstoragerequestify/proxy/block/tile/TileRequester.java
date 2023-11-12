@@ -61,7 +61,7 @@ public class TileRequester extends NetworkNodeBlockEntity<NetworkNodeRequester> 
             .build();
 
     public TileRequester(BlockPos pos, BlockState state) {
-        super(Registry.REQUESTER_TYPE.get(), pos, state, SPEC);
+        super(Registry.REQUESTER_TYPE.get(), pos, state, SPEC, NetworkNodeRequester.class);
     }
 
     @Override
