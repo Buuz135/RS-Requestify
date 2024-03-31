@@ -84,18 +84,17 @@ public class GuiRequester extends BaseScreen<ContainerRequester> {
         addWidget(textField);
     }
 
+    @Override
+    public void tick(int i, int i1) {
+
+    }
+
     public EditBox getTextField() {
         return textField;
     }
 
     @Override
-    public void tick(int i, int i1) {
-        textField.tick();
-    }
-
-    @Override
     public void renderBackground(GuiGraphics graphics, int x, int y, int mouseX, int mouseY) {
-
         graphics.blit(new ResourceLocation(RefinedStorageRequestify.MOD_ID, "textures/gui/requester.png"), x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         if (TileRequester.MISSING.getValue()) {

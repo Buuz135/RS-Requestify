@@ -22,29 +22,25 @@
 
 package com.buuz135.refinedstoragerequestify.proxy.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class RequestifyConfig {
-
-    public static int MAX_CRAFT_AMOUNT = 1000;
-
 
     public static Common COMMON = new Common();
 
     private static abstract class ConfigClass {
-        public ForgeConfigSpec SPEC;
+        public ModConfigSpec SPEC;
 
         public abstract void onConfigReload(ModConfigEvent.Reloading event);
     }
 
     public static class Common extends ConfigClass {
-        public ForgeConfigSpec.ConfigValue<Integer> MAX_CRAFT_AMOUNT;
-        public ForgeConfigSpec.ConfigValue<Boolean> IGNORE_ITEM_DAMAGE;
+        public ModConfigSpec.ConfigValue<Integer> MAX_CRAFT_AMOUNT;
 
         public Common() {
-            final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+            final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
             BUILDER.push("COMMON");
             MAX_CRAFT_AMOUNT = BUILDER.comment("Max amount of items per request").defineInRange("MAX_CRAFT_AMOUNT", 1000, 1, Integer.MAX_VALUE);
             BUILDER.pop();

@@ -22,7 +22,6 @@
 
 package com.buuz135.refinedstoragerequestify.proxy.block;
 
-import com.buuz135.refinedstoragerequestify.RefinedStorageRequestify;
 import com.buuz135.refinedstoragerequestify.proxy.block.network.NetworkNodeCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.block.tile.TileCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerCraftingEmitter;
@@ -39,7 +38,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -55,7 +53,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -70,7 +67,6 @@ public class BlockCraftingEmitter extends NetworkNodeBlock {
         super(BlockUtils.DEFAULT_ROCK_PROPERTIES);
         API.instance().getNetworkNodeRegistry().add(NetworkNodeCraftingEmitter.ID, (compoundNBT, level, blockPos) -> readAndReturn(compoundNBT, new NetworkNodeCraftingEmitter(level, blockPos)));
         this.registerDefaultState(this.getStateDefinition().any().setValue(POWERED, false));
-        //setCreativeTab(RefinedStorageRequestify.TAB);
     }
 
     @Override
@@ -100,8 +96,7 @@ public class BlockCraftingEmitter extends NetworkNodeBlock {
     @SuppressWarnings("deprecation")
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
         if (!level.isClientSide) {
-            return NetworkUtils.attempt(level, pos, player, () -> NetworkHooks.openScreen(
-                    (ServerPlayer) player,
+            return NetworkUtils.attempt(level, pos, player, () -> player.openMenu(
                     new BlockEntityMenuProvider<TileCraftingEmitter>(
                             Component.translatable("block.refinedstoragerequestify:crafting_emitter.name"),
                             (tile, windowId, inventory, p) -> new ContainerCraftingEmitter(tile, player, windowId),

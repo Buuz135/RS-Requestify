@@ -40,7 +40,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 public class NetworkNodeCraftingEmitter extends NetworkNode implements IType {
 
@@ -167,7 +167,7 @@ public class NetworkNodeCraftingEmitter extends NetworkNode implements IType {
         this.level.setBlockAndUpdate(this.pos, Registry.CRAFTING_EMITTER.get().defaultBlockState().setValue(BlockCraftingEmitter.POWERED, this.craftingTask != null));
         for (Direction direction : Direction.values()) {
             BlockPos blockpos = pos.offset(direction.getOpposite().getNormal());
-            if (net.minecraftforge.event.ForgeEventFactory.onNeighborNotify(level, pos, level.getBlockState(pos), java.util.EnumSet.of(direction.getOpposite()), false).isCanceled())
+            if (net.neoforged.neoforge.event.EventHooks.onNeighborNotify(level, pos, level.getBlockState(pos), java.util.EnumSet.of(direction.getOpposite()), false).isCanceled())
                 return;
             level.neighborChanged(blockpos, Registry.CRAFTING_EMITTER.get(), pos);
             level.updateNeighborsAtExceptFromFacing(blockpos, Registry.CRAFTING_EMITTER.get(), direction);

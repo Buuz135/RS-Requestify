@@ -48,8 +48,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
-
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -58,7 +56,6 @@ public class BlockRequester extends NetworkNodeBlock {
     public BlockRequester() {
         super(BlockUtils.DEFAULT_ROCK_PROPERTIES);
         API.instance().getNetworkNodeRegistry().add(NetworkNodeRequester.ID, (compoundNBT, world, blockPos) -> readAndReturn(compoundNBT, new NetworkNodeRequester(world, blockPos)));
-        //setCreativeTab(RefinedStorageRequestify.TAB);
     }
 
     @Override
@@ -69,8 +66,7 @@ public class BlockRequester extends NetworkNodeBlock {
     @SuppressWarnings("deprecation")
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
         if (!level.isClientSide) {
-            return NetworkUtils.attempt(level, pos, player, () -> NetworkHooks.openScreen(
-                    (ServerPlayer) player,
+            return NetworkUtils.attempt(level, pos, player, () -> player.openMenu(
                     new BlockEntityMenuProvider<TileRequester>(
                             Component.translatable("block.refinedstoragerequestify:requester.name"),
                             (tile, windowId, inventory, p) -> new ContainerRequester(tile, player, windowId),

@@ -25,16 +25,18 @@ package com.buuz135.refinedstoragerequestify;
 import com.buuz135.refinedstoragerequestify.proxy.Registry;
 import com.buuz135.refinedstoragerequestify.proxy.client.GuiCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.client.GuiRequester;
+import com.buuz135.refinedstoragerequestify.proxy.client.RSRequestifyClient;
 import com.buuz135.refinedstoragerequestify.proxy.config.RequestifyConfig;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerCraftingEmitter;
 import com.buuz135.refinedstoragerequestify.proxy.container.ContainerRequester;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 @Mod(RefinedStorageRequestify.MOD_ID)
 public class RefinedStorageRequestify {
@@ -43,21 +45,18 @@ public class RefinedStorageRequestify {
 
     public static Registry proxy;
 
-    public RefinedStorageRequestify() {
+    public RefinedStorageRequestify(IEventBus bus, Dist dist) {
         proxy = new Registry();
-        Registry.BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        Registry.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        Registry.BLOCK_ENTITY_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
-        Registry.MENU_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
-        Registry.CREATIVE_TABS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
+        Registry.BLOCKS.register(bus);
+        Registry.ITEMS.register(bus);
+        Registry.BLOCK_ENTITY_TYPES.register(bus);
+        Registry.MENU_TYPES.register(bus);
+        Registry.CREATIVE_TABS.register(bus);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, RequestifyConfig.COMMON.SPEC);
-        IEventBus mod = FMLJavaModLoadingContext.get().getModEventBus();
-        mod.addListener(RequestifyConfig.COMMON::onConfigReload);
-    }
+        bus.addListener(RequestifyConfig.COMMON::onConfigReload);
 
-    public void onClientSetup(FMLClientSetupEvent event) {
-        MenuScreens.register(Registry.REQUESTER_CONTAINER.get(), (MenuScreens.ScreenConstructor<ContainerRequester, GuiRequester>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiRequester(p_create_1_));
-        MenuScreens.register(Registry.CRAFTING_EMITTER_CONTAINER.get(), (MenuScreens.ScreenConstructor<ContainerCraftingEmitter, GuiCraftingEmitter>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiCraftingEmitter(p_create_1_));
+        if (dist.isClient()) {
+            bus.addListener(RSRequestifyClient::onRegisterScreens);
+        }
     }
 }
