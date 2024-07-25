@@ -1,0 +1,9 @@
+{
+  "itemGroup.rsrequestify": "RS: Requestify",
+  "block.rsrequestify.requester": "Talep Edici",
+  "button.refinedstoragerequestify:requester.save": "Kaydet",
+  "tooltip.refinedstoragerequestify:requester.missing": "Eksik malzemeler",
+  "block.rsrequestify.crafting_emitter": "Üretim Yayıcısı",
+  "block.rsrequestify.crafting_emitter.tooltip": "Filtredeki herhangi bir eşya/akışkan üretilirken bir Redstone Sinyali yayar.",
+  "block.rsrequestify.requester.tooltip": "Filtrelenen eşyayı/akışkanı istenen miktarda stokta tutar."
+}
