@@ -4,6 +4,6 @@
   "button.refinedstoragerequestify:requester.save": "保存",
   "tooltip.refinedstoragerequestify:requester.missing": "素材が足りません",
   "block.rsrequestify.crafting_emitter": "クラフティングエミッター",
-  "block.rsrequestify.crafting_emitter.tooltip": "フィルター内のアイテムや液体がクラフトされると、レッドストーン信号を発信します。",
-  "block.rsrequestify.requester.tooltip": "必要な量でフィルタリングされたアイテムや液体を在庫として保持します。"
+  "block.rsrequestify.crafting_emitter.tooltip": "フィルター内のアイテムや液体がクラフトされると、レッドストーン信号を発信します",
+  "block.rsrequestify.requester.tooltip": "必要な量でフィルタリングされたアイテムや液体を在庫として保持します"
 }
