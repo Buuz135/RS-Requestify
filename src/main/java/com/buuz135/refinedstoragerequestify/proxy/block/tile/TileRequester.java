@@ -36,7 +36,7 @@ import net.minecraft.world.World;
 public class TileRequester extends TileNode<NetworkNodeRequester> {
 
     public static final TileDataParameter<Integer, TileRequester> TYPE = IType.createParameter();
-    public static final TileDataParameter<Integer, TileRequester> AMOUNT = new TileDataParameter<>(DataSerializers.VARINT, 0, t -> t.getNode().getAmount(), (t, v) -> t.getNode().setAmount(v), (initial, p) -> GuiBase.executeLater(GuiRequester.class, requester -> requester.getAmount().setText(String.valueOf(p))));
+    public static final TileDataParameter<Integer, TileRequester> AMOUNT = new TileDataParameter<>(DataSerializers.VARINT, 0, t -> t.getNode().getAmount(), (t, v) -> { if (t.getWorld() == null || t.getWorld().isRemote || t.getNode().getAmount() == v) return; t.getNode().setAmount(v);}, (initial, p) -> { if (initial) { System.out.println("skipped initial"); return;} GuiBase.executeLater(GuiRequester.class, requester -> { if (!requester.getAmount().isFocused() || p != 0) { requester.getAmount().setText(String.valueOf(p));}});});
     public static final TileDataParameter<Boolean, TileRequester> MISSING = new TileDataParameter<>(DataSerializers.BOOLEAN, false, tileRequester -> tileRequester.getNode().isMissingItems(), (tileRequester, aBoolean) -> {
     });
 

@@ -4,7 +4,6 @@
     "name": "RefinedStorageRequestify",
     "description": "",
     "version": "${version}",
-    "mcversion": "${mcversion}",
     "url": "",
     "updateUrl": "",
     "authorList": [

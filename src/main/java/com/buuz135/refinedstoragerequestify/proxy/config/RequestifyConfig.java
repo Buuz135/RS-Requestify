@@ -32,7 +32,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class RequestifyConfig {
     @Config.Comment("The maximum amount requested as a craft by the Requester. It will still achieve the desired amount but in smaller crafting batches. (A sanity server check)")
     @Config.RangeInt(min = 1)
-    public static int MAX_CRAFT_AMOUNT = 1000;
+    public static int maxCraftAmount = 1000;
+
+    @Config.Comment("The amount ticks between attempts to craft by the Requester where 20 ticks = 1 second (lower - better for you, but not the server)")
+    @Config.RangeInt(min = 5, max = 1000)
+    public static int ticksBetweenUpdates = 10;
 
     @Mod.EventBusSubscriber(modid = RefinedStorageRequestify.MOD_ID)
     private static class EventHandler {

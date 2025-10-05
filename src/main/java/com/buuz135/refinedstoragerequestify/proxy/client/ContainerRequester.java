@@ -32,8 +32,12 @@ public class ContainerRequester extends ContainerBase {
 
     public ContainerRequester(TileRequester tile, EntityPlayer player) {
         super(tile, player);
-        addSlotToContainer(new SlotFilter(tile.getNode().getItemFilters(), 0, 17, 20).setEnableHandler(() -> tile.getNode().getType() == IType.ITEMS));
-        addSlotToContainer(new SlotFilterFluid(tile.getNode().getFluidFilters(), 0, 17, 20).setEnableHandler(() -> tile.getNode().getType() == IType.FLUIDS));
+        for (int i = 0; i < 9; ++i) {
+            addSlotToContainer(new SlotFilter(tile.getNode().getItemFilters(), i, 8 + (18 * i), 20).setEnableHandler(() -> tile.getNode().getType() == IType.ITEMS));
+        }
+        for (int i = 0; i < 9; ++i) {
+            addSlotToContainer(new SlotFilterFluid(tile.getNode().getFluidFilters(), i, 8 + (18 * i), 20).setEnableHandler(() -> tile.getNode().getType() == IType.FLUIDS));
+        }
         addPlayerInventory(8, 55);
         transferManager.addFilterTransfer(player.inventory, tile.getNode().getItemFilters(), tile.getNode().getFluidFilters(), tile.getNode()::getType);
     }

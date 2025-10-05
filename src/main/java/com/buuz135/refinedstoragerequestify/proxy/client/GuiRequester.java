@@ -30,13 +30,13 @@ import com.raoulvdberge.refinedstorage.tile.data.TileDataManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.IOException;
 
 public class GuiRequester extends GuiBase {
 
     private GuiTextField textField;
+    private static final int AMOUNT_FIELD_ID = -/*buuz*/135;
     private GuiButton button;
 
     public GuiRequester(ContainerRequester container) {
@@ -47,11 +47,26 @@ public class GuiRequester extends GuiBase {
     public void init(int x, int y) {
         addSideButton(new SideButtonRedstoneMode(this, TileRequester.REDSTONE_MODE));
         addSideButton(new SideButtonType(this, TileRequester.TYPE));
-        textField = new GuiTextField(-135, Minecraft.getMinecraft().fontRenderer, x + 20 + 18, y + 23, 80, 10);
-        textField.setText(TileRequester.AMOUNT.getValue() + "");
+        textField = new GuiTextField(AMOUNT_FIELD_ID, Minecraft.getMinecraft().fontRenderer, x + 86, y + 41, 80, 10);
+        textField.setText(String.valueOf(TileRequester.AMOUNT.getValue()));
         textField.setCanLoseFocus(true);
         textField.setFocused(true);
-        button = addButton(x + 40 + 86, y + 19, 40, 20, t("button.refinedstoragerequestify:requester.save"));
+        textField.setValidator(s -> s.isEmpty() || s.matches("\\d+")); // только числа
+        textField.setText(String.valueOf(TileRequester.AMOUNT.getValue()));
+        textField.setGuiResponder(new net.minecraft.client.gui.GuiPageButtonList.GuiResponder() {
+            @Override
+            public void setEntryValue(int id, String value) {
+                if (id != AMOUNT_FIELD_ID) return;
+                if (value == null || value.isEmpty()) return;
+                try {
+                    int result = value.isEmpty() ? 0 : Integer.parseInt(value);
+                    TileDataManager.setParameter(TileRequester.AMOUNT, result);
+                    System.out.println("TileDataManager AMOUNT" + result);
+                } catch (NumberFormatException ignored) { /* NO-OP */ }
+            }
+            @Override public void setEntryValue(int id, boolean value) { /* NO-OP */ }
+            @Override public void setEntryValue(int id, float value)    { /* NO-OP */ }
+        });
     }
 
     @Override
@@ -81,33 +96,37 @@ public class GuiRequester extends GuiBase {
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        if (keyCode == 1) {
+        if (keyCode == 1 || keyCode == this.mc.gameSettings.keyBindInventory.getKeyCode()) {
             this.mc.player.closeScreen();
+            return;
         }
-        textField.textboxKeyTyped(typedChar, keyCode);
-        StringBuilder builder = new StringBuilder();
-        int pos = 0;
-        for (char c : textField.getText().toCharArray()) {
-            if (pos == 0 && c == '0' && textField.getText().length() > 1) {
-                continue;
-            }
-            if (NumberUtils.isCreatable(c + "")) builder = builder.append(c);
-            ++pos;
+
+        if (!textField.textboxKeyTyped(typedChar, keyCode)) {
+            super.keyTyped(typedChar, keyCode);
         }
-        textField.setText(builder.toString());
     }
 
     @Override
-    protected void actionPerformed(GuiButton button) throws IOException {
-        super.actionPerformed(button);
-        if (this.button.equals(button) && NumberUtils.isCreatable(textField.getText())) {
-            long amount = NumberUtils.createLong(textField.getText());
-            if (amount > Integer.MAX_VALUE) amount = Integer.MAX_VALUE;
-            TileDataManager.setParameter(TileRequester.AMOUNT, (int) amount);
-        }
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+        textField.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     public GuiTextField getAmount() {
         return textField;
     }
+
+//    @Override
+//    public void onGuiClosed() {
+//        super.onGuiClosed();
+//        String value = textField.getText();
+//        int result = 0;
+//        if (!(value == null || value.trim().isEmpty())) {
+//            try {
+//                result = Integer.parseInt(value.trim());
+//            } catch (NumberFormatException ignored) { /* NO-OP */ }
+//        }
+//        System.out.println(result);
+//        TileDataManager.setParameter(TileRequester.AMOUNT, result);
+//    }
 }
