@@ -38,3 +38,4 @@ jobs:
           changelog: "https://github.com/Buuz135/RS-Requestify/commits/1.21"
           dependencies: |
             refined-storage | depends
+            titanium | depends
