@@ -13,7 +13,7 @@
       "item": "refinedstorage:detector"
     },
     "C": {
-      "item": "refinedstorage:crafting_upgrade"
+      "item": "refinedstorage:autocrafter"
     },
     "F": {
       "item": "refinedstorage:machine_casing"
@@ -23,6 +23,7 @@
     }
   },
   "result": {
-    "item": "rsrequestify:requester"
+    "count": 1,
+    "id": "rsrequestify:requester"
   }
 }

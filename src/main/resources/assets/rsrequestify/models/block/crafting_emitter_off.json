@@ -1,5 +1,5 @@
 {
-  "parent": "refinedstorage:block/detector",
+  "parent": "refinedstorage:block/detector/unpowered",
   "textures": {
     "torch": "rsrequestify:block/crafting_emitter/off",
     "side": "rsrequestify:block/crafting_emitter/side"

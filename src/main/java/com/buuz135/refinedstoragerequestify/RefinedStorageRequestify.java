@@ -1,63 +1,68 @@
-/*
- * This file is part of RSRequestifyu.
- *
- * Copyright 2021, Buuz135
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in the
- * Software without restriction, including without limitation the rights to use, copy,
- * modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to the
- * following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies
- * or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
- * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
- * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
 package com.buuz135.refinedstoragerequestify;
 
-import com.buuz135.refinedstoragerequestify.proxy.Registry;
-import com.buuz135.refinedstoragerequestify.proxy.client.GuiCraftingEmitter;
-import com.buuz135.refinedstoragerequestify.proxy.client.GuiRequester;
-import com.buuz135.refinedstoragerequestify.proxy.config.RequestifyConfig;
-import com.buuz135.refinedstoragerequestify.proxy.container.ContainerCraftingEmitter;
-import com.buuz135.refinedstoragerequestify.proxy.container.ContainerRequester;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import com.buuz135.refinedstoragerequestify.block.tile.CraftingEmitterBlockEntity;
+import com.buuz135.refinedstoragerequestify.block.tile.RequesterBlockEntity;
+import com.buuz135.refinedstoragerequestify.client.CraftingEmitterScreen;
+import com.buuz135.refinedstoragerequestify.client.RequesterScreen;
+import com.buuz135.refinedstoragerequestify.container.CraftingEmitterContainer;
+import com.buuz135.refinedstoragerequestify.container.RequesterContainer;
+import com.hrznstudio.titanium.event.handler.EventManager;
+import com.hrznstudio.titanium.module.ModuleController;
+import com.refinedmods.refinedstorage.common.api.RefinedStorageApi;
+import com.refinedmods.refinedstorage.common.content.Items;
+import com.refinedmods.refinedstorage.neoforge.api.RefinedStorageNeoForgeApi;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+
 
 @Mod(RefinedStorageRequestify.MOD_ID)
-public class RefinedStorageRequestify {
+public class RefinedStorageRequestify extends ModuleController {
 
     public static final String MOD_ID = "rsrequestify";
 
-    public static Registry proxy;
+    public RefinedStorageRequestify(Dist dist, IEventBus modEventBus, ModContainer modContainer) {
+        super(modContainer);
+        EventManager.mod(RegisterCapabilitiesEvent.class).process(event -> {
+            event.registerBlock(RefinedStorageNeoForgeApi.INSTANCE.getNetworkNodeContainerProviderCapability(), (level, blockPos, blockState, blockEntity, direction) -> {
+                if (blockEntity instanceof RequesterBlockEntity requesterBlockEntity) {
+                    return requesterBlockEntity.getContainerProvider();
+                }
+                return null;
+            }, RSRContent.Blocks.REQUESTER.get());
+            event.registerBlock(RefinedStorageNeoForgeApi.INSTANCE.getNetworkNodeContainerProviderCapability(), (level, blockPos, blockState, blockEntity, direction) -> {
+                if (blockEntity instanceof CraftingEmitterBlockEntity craftingEmitterBlockEntity) {
+                    return craftingEmitterBlockEntity.getContainerProvider();
+                }
+                return null;
+            }, RSRContent.Blocks.CRAFTING_EMITTER.get());
+        }).subscribe();
+        EventManager.mod(FMLCommonSetupEvent.class).process(event -> {
+            RefinedStorageApi.INSTANCE.getUpgradeRegistry().forDestination(RSRContent.REQUESTER_DESTINATION).add(Items.INSTANCE.getStackUpgrade(), 4);
+        }).subscribe();
 
-    public RefinedStorageRequestify() {
-        proxy = new Registry();
-        Registry.BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        Registry.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        Registry.BLOCK_ENTITY_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
-        Registry.MENU_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
-        Registry.CREATIVE_TABS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, RequestifyConfig.COMMON.SPEC);
-        IEventBus mod = FMLJavaModLoadingContext.get().getModEventBus();
-        mod.addListener(RequestifyConfig.COMMON::onConfigReload);
+        if (dist.isClient()) {
+            EventManager.mod(RegisterMenuScreensEvent.class).process(event -> {
+                event.register((MenuType<RequesterContainer>) RSRContent.Menus.REQUESTER.get(), RequesterScreen::new);
+                event.register((MenuType<CraftingEmitterContainer>) RSRContent.Menus.CRAFTING_EMITTER.get(), CraftingEmitterScreen::new);
+
+            }).subscribe();
+        }
     }
 
-    public void onClientSetup(FMLClientSetupEvent event) {
-        MenuScreens.register(Registry.REQUESTER_CONTAINER.get(), (MenuScreens.ScreenConstructor<ContainerRequester, GuiRequester>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiRequester(p_create_1_));
-        MenuScreens.register(Registry.CRAFTING_EMITTER_CONTAINER.get(), (MenuScreens.ScreenConstructor<ContainerCraftingEmitter, GuiCraftingEmitter>) (p_create_1_, p_create_2_, p_create_3_) -> new GuiCraftingEmitter(p_create_1_));
+    @Override
+    protected void initModules() {
+        addCreativeTab("main", () -> new ItemStack(RSRContent.Items.REQUESTER), "rsrequestify", RSRContent.TAB);
+
+        RSRContent.Blocks.init();
+        RSRContent.Items.init();
+        RSRContent.Menus.init();
+
     }
 }

@@ -14,27 +14,27 @@ jobs:
         uses: actions/checkout@v2
       - name: validate gradle wrapper
         uses: gradle/wrapper-validation-action@v1
-      - name: setup jdk 17
+      - name: setup jdk21
         uses: actions/setup-java@v1
         with:
-          java-version: "17"
+          java-version: "21"
       - name: make gradle wrapper executable
         if: ${{ runner.os != 'Windows' }}
         run: chmod +x ./gradlew
       - name: build
         run: ./gradlew build
       - name: Publish Minecraft Mods Forge
-        uses: Kir-Antipov/mc-publish@v2.1
+        uses: Kir-Antipov/mc-publish@v3.1
         with:
           curseforge-id: 307788
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           files-primary: build/libs/!(*-@(dev|sources)).jar
           files-secondary: build/libs/*-@(dev|sources).jar
           version-type: beta
-          loaders: forge
-          game-versions: 1.20.1
-          java: 17
+          loaders: neoforge
+          game-versions: 1.21.1
+          java: 21
           name: ""
-          changelog: "https://github.com/Buuz135/RS-Requestify/commits/1.20"
+          changelog: "https://github.com/Buuz135/RS-Requestify/commits/1.21"
           dependencies: |
             refined-storage | depends
